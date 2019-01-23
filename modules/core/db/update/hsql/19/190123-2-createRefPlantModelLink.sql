@@ -1,0 +1,2 @@
+alter table REF_PLANT_MODEL_LINK add constraint FK_REFPLAMOD_ON_PLANT foreign key (PLANT_ID) references REF_PLANT(ID);
+alter table REF_PLANT_MODEL_LINK add constraint FK_REFPLAMOD_ON_MODEL foreign key (MODEL_ID) references REF_MODEL(ID);

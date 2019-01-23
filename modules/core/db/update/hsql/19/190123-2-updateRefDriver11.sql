@@ -1,0 +1,2 @@
+alter table REF_DRIVER add constraint FK_REF_DRIVER_ON_DRIVER_GROUP foreign key (DRIVER_GROUP_ID) references REF_DRIVER_GROUP(ID);
+create index IDX_REF_DRIVER_ON_DRIVER_GROUP on REF_DRIVER (DRIVER_GROUP_ID);

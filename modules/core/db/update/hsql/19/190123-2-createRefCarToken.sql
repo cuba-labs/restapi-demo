@@ -1,0 +1,4 @@
+alter table REF_CAR_TOKEN add constraint FK_REF_CAR_TOKEN_ON_REPAIR foreign key (REPAIR_ID) references REF_REPAIR(ID);
+alter table REF_CAR_TOKEN add constraint FK_REF_CAR_TOKEN_ON_GARAGE_TOKEN foreign key (GARAGE_TOKEN_ID) references REF_CAR_GARAGE_TOKEN(ID);
+create index IDX_REF_CAR_TOKEN_ON_REPAIR on REF_CAR_TOKEN (REPAIR_ID);
+create index IDX_REF_CAR_TOKEN_ON_GARAGE_TOKEN on REF_CAR_TOKEN (GARAGE_TOKEN_ID);

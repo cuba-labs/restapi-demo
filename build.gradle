@@ -1,0 +1,258 @@
+
+buildscript {
+    ext.cubaVersion = '7.0-SNAPSHOT'
+    repositories {
+        maven {
+            url "http://repository.haulmont.com:8587/nexus/content/groups/work"
+            credentials {
+                username System.getenv('HAULMONT_REPOSITORY_USER')
+                password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+            }
+        }
+        
+    }
+    dependencies {
+        classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+    }
+}
+
+def modulePrefix = 'app'
+
+def globalModule = project(":${modulePrefix}-global")
+def coreModule = project(":${modulePrefix}-core")
+def webModule = project(":${modulePrefix}-web")
+def portalModule = project(":${modulePrefix}-portal")
+
+def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
+
+apply(plugin: 'cuba')
+
+cuba {
+    artifact {
+        group = 'com.haulmont.addon.restaddondemo'
+        version = '0.1'
+        isSnapshot = true
+    }
+    tomcat {
+        dir = "$project.rootDir/deploy/tomcat"
+    }
+}
+
+dependencies {
+    appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
+    appComponent("com.haulmont.bpm:bpm-global:$cubaVersion")
+}
+
+def postgres = 'org.postgresql:postgresql:42.2.4'
+
+configure([globalModule, coreModule, webModule, portalModule]) {
+    apply(plugin: 'java')
+    apply(plugin: 'maven')
+    apply(plugin: 'cuba')
+
+    dependencies {
+        testCompile('junit:junit:4.12')
+        testCompile('org.jmockit:jmockit:1.39')
+        testCompile('org.spockframework:spock-core:1.2-groovy-2.5')
+        // New http client needed for running selenium tests
+        compile('org.apache.httpcomponents:httpcore:4.4.10')
+    }
+
+    sourceSets {
+        test {
+            java {
+                srcDirs = ['test']
+            }
+        }
+    }
+
+    task sourceJar(type: Jar) {
+        from file('src')
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives sourceJar
+    }
+}
+
+configure(globalModule) {
+    entitiesEnhancing {
+        main {
+            enabled = true
+        }
+    }
+}
+
+configure(coreModule) {
+
+    configurations {
+        jdbc
+        dbscripts
+    }
+
+    dependencies {
+        compile(globalModule)
+        compileOnly(servletApi)
+        jdbc(postgres)
+        testRuntime(postgres)
+    }
+
+    task cleanConf(description: 'Cleans up conf directory') {
+        doLast {
+            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}-core")
+            if (dir.isDirectory()) {
+                ant.delete(includeemptydirs: true) {
+                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+                }
+            }
+        }
+    }
+
+    task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
+        appName = "${modulePrefix}-core"
+        appJars(modulePrefix + '-global', modulePrefix + '-core')
+    }
+
+    task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
+        dbms = 'postgres'
+        host = 'localhost'
+        dbName = 'refapp_6'
+        dbUser = 'cuba'
+        dbPassword = 'cuba'
+    }
+
+    task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
+        dbms = 'postgres'
+        host = 'localhost'
+        dbName = 'refapp_6'
+        dbUser = 'cuba'
+        dbPassword = 'cuba'
+    }
+}
+
+configure(webModule) {
+    configurations {
+        webcontent
+    }
+
+    dependencies {
+        compileOnly(servletApi)
+        compile(globalModule)
+    }
+
+    task webArchive(type: Zip) {
+        from file("$buildDir/web")
+        from file('web')
+        classifier = 'web'
+    }
+
+    artifacts {
+        archives webArchive
+    }
+
+    task deployConf(type: Copy) {
+        from file('src')
+        include "com/haulmont/addon/restaddondemo/**"
+        into "$cuba.tomcat.dir/conf/${modulePrefix}"
+    }
+
+    task clearMessagesCache(type: CubaClearMessagesCache) {
+        appName = "${modulePrefix}"
+    }
+    deployConf.dependsOn clearMessagesCache
+
+    task cleanConf(description: 'Cleans up conf directory') {
+        doLast {
+            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}")
+            if (dir.isDirectory()) {
+                ant.delete(includeemptydirs: true) {
+                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+                }
+            }
+        }
+    }
+
+    task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
+        appName = "${modulePrefix}"
+        appJars(modulePrefix + '-global', modulePrefix + '-web')
+    }
+}
+
+configure(portalModule) {
+    dependencies {
+        compileOnly(servletApi)
+        compile(globalModule)
+
+        testCompile('com.haulmont.masquerade:masquerade-connector:1.0-SNAPSHOT')
+        testCompile('com.jayway.jsonpath:json-path:2.4.0')
+        testCompile('org.apache.httpcomponents:fluent-hc:4.5.2')
+        testCompile('org.apache.httpcomponents:httpmime:4.5.2')
+        testCompile('io.rest-assured:rest-assured:3.0.7')
+    }
+
+    def webappName = "${modulePrefix}-portal"
+    def resourcesDir = "$cuba.tomcat.dir/webapps/$webappName/resources"
+    def ftlDir = "$cuba.tomcat.dir/webapps/$webappName/WEB-INF/templates"
+
+    task deploy(dependsOn: assemble, type: CubaDeployment) {
+        appName = webappName
+        appJars(modulePrefix + '-global', modulePrefix + '-portal')
+    }
+
+    task deployStatic() {
+        doLast {
+            copy {
+                from file('web/resources')
+                include '**/*.css'
+                include '**/*.js'
+                include '**/*.png'
+                include '**/*.gif'
+                include '**/*.jpg'
+                into resourcesDir
+            }
+            copy {
+                from file('web/WEB-INF/templates')
+                include '**/*.ftl'
+                into ftlDir
+            }
+        }
+    }
+
+    task cleanStatic() {
+        doLast {
+            delete resourcesDir
+            delete ftlDir
+        }
+    }
+
+    task webArchive(type: Zip) {
+        from file('web')
+        from file("$buildDir/web")
+        exclude '**/web.xml', '**/app.properties'
+        classifier = 'web'
+    }
+
+    artifacts {
+        archives webArchive
+    }
+}
+
+task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {
+    delete("$cuba.tomcat.dir/shared")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}-core")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}-portal")
+}
+
+task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefix}-web:deploy", ":${modulePrefix}-portal:deploy"], description: 'Redeploys applications and restarts local Tomcat') {
+    doLast {
+        ant.waitfor(maxwait: 6, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            not {
+                socket(server: 'localhost', port: '8787')
+            }
+        }
+        start.execute()
+    }
+}
+
