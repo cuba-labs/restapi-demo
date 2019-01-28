@@ -1,0 +1,32 @@
+{
+  "service": "refapp_PortalTestService",
+  "method": "updateCarVin",
+  "view": "carEdit",
+  "params": {
+    "param0": {
+      "id": "ref_Car-$CAR_ID$",
+      "vin": "$CAR_VIN$",
+      "colour" : {
+        "id": "ref$Colour-$COLOUR_ID$",
+        "name": "$COLOUR_NAME$"
+      },
+      "driverAllocations": [
+        {
+          "id": "ref$DriverAllocation-$DRIVER_ALLOCATION_ID_1$"
+        },
+        {
+          "id": "NEW-ref$DriverAllocation"
+        }
+      ],
+      "repairs": [
+        {
+          "id": "ref$Repair-$REPAIR_ID_1$"
+        },
+        {
+          "id": "ref$Repair-$REPAIR_ID_2$"
+        }
+      ]
+    },
+    "param1": "$CAR_NEW_VIN$"
+  }
+}

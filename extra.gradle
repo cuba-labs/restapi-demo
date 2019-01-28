@@ -1,0 +1,516 @@
+/*
+ * Copyright (c) 2008-2016 Haulmont. All rights reserved.
+ * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+ */
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'http://repository.haulmont.com:8587/nexus/content/groups/work/'
+            credentials {
+                username System.getenv('HAULMONT_REPOSITORY_USER')
+                password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+            }
+        }
+    }
+    dependencies {
+        classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+    }
+}
+
+apply(plugin: 'cuba')
+
+String demoToken = null
+if (project.rootProject.hasProperty('demoToken')) {
+    demoToken = project.rootProject['demoToken']
+} else if (project.rootProject.hasProperty('demoBranch')) {
+    demoToken = ext.cubaVersion.replace('.', '').replace("-SNAPSHOT", "")
+}
+
+def coreModule = project(':app-core')
+def webModule = project(':app-web')
+def portalModule = project(':app-portal')
+
+def coreJarNames = ['cuba-global', 'cuba-core',
+                    'reports-global', 'reports-core',
+                    'ccpayments-global', 'ccpayments-core',
+                    'workflow-global', 'workflow-core',
+                    'bpm-global', 'bpm-core',
+                    'fts-global', 'fts-core',
+                    'charts-global',
+                    'app-global', 'app-core']
+
+configure(coreModule) {
+    task testDataModel(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/refapp/core/RefAppPostgresTest.class")
+        systemProperties = System.getProperties()
+    }
+
+    task testDatabase(type: Test, dependsOn: testClasses) {
+        include("**/*PostgresTest.class")
+        exclude("com/haulmont/refapp/core/RefAppPostgresTest.class")
+        systemProperties = System.getProperties()
+        testLogging {
+            events 'passed'
+        }
+    }
+
+    task testDataModelHsql(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/refapp/db_hsql/DataModelHsqlTestClass.class")
+        systemProperties = System.getProperties()
+    }
+
+    task testDatabaseHsql(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/refapp/db_hsql/HsqlTestSuite.class")
+        systemProperties = System.getProperties()
+        testLogging {
+            events 'passed'
+        }
+    }
+
+
+    assembleDbScripts { moduleAlias = '30-refapp' }
+
+    task createTestDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for tests', type: CubaDbCreation) {
+        dbms = 'postgres'
+        dbName = 'refapp_test_6'
+        dbUser = 'root'
+        dbPassword = 'root'
+    }
+
+    task createDemoDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for demo', type: CubaDbCreation) {
+        dbms = 'postgres'
+        dbName = ('refapp_demo' + (demoToken != null ? '_' + demoToken : ''))
+        dbUser = 'root'
+        dbPassword = 'root'
+    }
+
+    task updateTestDb(dependsOn: assembleDbScripts, description: 'Updates local Postgres database for tests', type: CubaDbUpdate) {
+        dbms = 'postgres'
+        dbName = 'refapp_test_6'
+        dbUser = 'root'
+        dbPassword = 'root'
+    }
+
+
+
+    // HSQLDB stuff
+
+    def hsqlDbName = 'cubadb'
+
+    task startHsqlDb(description: 'Starts local HSQLDB server', type: CubaHsqlStart) {
+        dbName = hsqlDbName
+    }
+
+    task stopHsqlDb(description: 'Stops local HSQLDB server', type: CubaHsqlStop) {
+        dbName = hsqlDbName
+    }
+
+    task killHsqlDb(description: 'Kill local HSQLDB server process running on port 9001', type: CubaKillProcess) {
+        port = 9001
+    }
+
+    task removeHsqlDb(description: 'Removes local HSQL database', type: Delete) {
+        delete new File("$rootProject.projectDir/data")
+    }
+
+    task createHsqlDb(dependsOn: assembleDbScripts, description: 'Creates local HSQL database', type: CubaDbCreation) {
+        dbms = 'hsql'
+        dbName = hsqlDbName
+        dbUser = 'sa'
+        dbPassword = ''
+    }
+
+    task updateHsqlDb(dependsOn: assembleDbScripts, description: 'Updates local HSQL database', type: CubaDbUpdate) {
+        dbms = 'hsql'
+        dbName = hsqlDbName
+        dbUser = 'sa'
+        dbPassword = ''
+    }
+
+    // Sample data
+
+    task createSampleData(type: CubaDbScript) {
+        dbms = 'postgres'
+        dbName = 'refapp_6'
+        dbUser = 'root'
+        dbPassword = 'root'
+
+        script 'db/init/postgres/create-sample-data.sql'
+    }
+}
+
+
+configure(webModule) {
+    test {
+        exclude '**/*UiTest.class'
+    }
+
+    task testUi(type: Test, dependsOn: testClasses) {
+        include('**/*UiTest.class')
+
+        if (System.getProperty('cuba.testui.remoteDriver')) {
+            systemProperty 'cuba.testui.remoteDriver', System.getProperty('cuba.testui.remoteDriver')
+        }
+        if (System.getProperty('selenide.baseUrl')) {
+            systemProperty 'selenide.baseUrl', System.getProperty('selenide.baseUrl')
+        }
+        if (System.getProperty('cuba.testui.browser')) {
+            systemProperty 'cuba.testui.browser', System.getProperty('cuba.testui.browser')
+        }
+        if (System.getProperty('browser')) {
+            systemProperty 'browser', System.getProperty('browser')
+        }
+
+        if (System.getProperty('selenide.reports')) {
+            systemProperty 'selenide.reports', System.getProperty('selenide.reports')
+        }
+        if (System.getProperty('selenide.reportsUrl')) {
+            systemProperty 'selenide.reportsUrl', System.getProperty('selenide.reportsUrl')
+        }
+        if (System.getProperty('selenide.timeout')) {
+            systemProperty 'selenide.timeout', System.getProperty('selenide.timeout')
+        }
+        if (System.getProperty('selenide.browser')) {
+            systemProperty 'selenide.browser', System.getProperty('selenide.browser')
+        }
+        if (System.getProperty('webdriver.gecko.driver')) {
+            systemProperty 'webdriver.gecko.driver', System.getProperty('webdriver.gecko.driver')
+        }
+
+        if (System.getProperty('cuba.testui.appLog')) {
+            systemProperty 'cuba.testui.appLog', System.getProperty('cuba.testui.appLog')
+        }
+        systemProperty 'selenide.savePageSource', 'false'
+    }
+
+    task zipUiTestResults(type: Zip) {
+        from file("$buildDir/reports")
+        destinationDir file("$buildDir")
+        archiveName "ui-test-reports.zip"
+    }
+
+    task checkLog() {
+        doLast {
+            String fileName = System.getProperty("cuba.testui.appLog", "$cuba.tomcat.dir/logs/app.log")
+            File file = new File(fileName)
+            file.readLines().each {
+                if (it.contains("ERROR")) {
+                    throw new GradleException("Log file contains ERROR: " + it)
+                }
+            }
+        }
+    }
+
+
+}
+
+
+configure(portalModule) {
+//    test {
+//        scanForTestClasses = false
+//        includes = ['**/*Test.class']
+//    }
+
+    task funcTest(dependsOn: ':prepareTest', description: 'Run functional tests', type: Test) {
+        scanForTestClasses = false
+        includes = ['**/*FT.class']
+        workingDir = "$projectDir/../../"
+    }
+}
+
+task clearConf(description: 'Clears conf directory') {
+    doLast {
+        def dir = new File(cuba.tomcat.dir, '/conf/app')
+        if (dir.isDirectory()) {
+            ant.delete(includeemptydirs: true) {
+                fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+            }
+        }
+    }
+}
+
+task stopTomcatAfterTest(type: CubaStopTomcat, description: 'Stops Tomcat after functional tests') {
+    tomcatRootDir = cuba.tomcat.dir
+}
+
+task enableRemoteJmx() {
+    doLast {
+        project.file("${cuba.tomcat.dir}/bin/setenv.bat").text = '''
+set CATALINA_OPTS=-Xmx512m -Dfile.encoding=UTF-8
+
+set CATALINA_OPTS=%CATALINA_OPTS% -Dlogback.configurationFile=../conf/logback.xml
+
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote 
+set CATALINA_OPTS=%CATALINA_OPTS% -Djava.rmi.server.hostname=localhost 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.port=7777 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.ssl=false 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.authenticate=false
+
+set JPDA_OPTS=-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+'''
+
+        project.file("${cuba.tomcat.dir}/bin/setenv.sh").text = '''
+CATALINA_OPTS="-Xmx512m -Dfile.encoding=UTF-8"
+
+CATALINA_OPTS="$CATALINA_OPTS -Dlogback.configurationFile=../conf/logback.xml"
+
+CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote"
+
+CATALINA_OPTS="$CATALINA_OPTS \\
+-Djava.rmi.server.hostname=localhost \\
+-Dcom.sun.management.jmxremote.port=7777 \\
+-Dcom.sun.management.jmxremote.ssl=false \\
+-Dcom.sun.management.jmxremote.authenticate=false"
+
+JPDA_OPTS="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+'''
+    }
+}
+
+task enableTestProperties() {
+    doLast {
+        project.file("${cuba.tomcat.dir}/conf/app-core/").mkdirs()
+        project.file("${cuba.tomcat.dir}/conf/app-core/local.app.properties").text = '''
+refapp.core.embeddedLdap.startTcpServer = true
+'''
+        project.file("${cuba.tomcat.dir}/conf/app-portal/").mkdirs()
+        project.file("${cuba.tomcat.dir}/conf/app-portal/local.app.properties").text = '''
+cuba.rest.ldap.enabled = true
+cuba.rest.ldap.urls = ldap://localhost:10389
+cuba.rest.ldap.base = dc=example,dc=com
+cuba.rest.ldap.user = cn=refapp,dc=example,dc=com
+cuba.rest.ldap.password = refapp
+cuba.rest.ldap.userLoginField = cn
+'''
+    }
+}
+
+task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble],
+                 description: 'Prepare server for tests') {
+    doLast {
+        // Setup
+        setupTomcat.execute()
+
+        // Test configuration
+        enableTestProperties.execute()
+        enableRemoteJmx.execute()
+
+        // Deploy
+        coreModule.deploy.execute()
+        webModule.deploy.execute()
+        portalModule.deploy.execute()
+        // Create DB
+        coreModule.createDb.execute()
+        // Start server
+        start.execute()
+
+        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            http(url: "http://localhost:8080/app")
+        }
+        // Delete out directory
+        File dir = new File("$projectDir/tests/ui/out")
+        if (dir.exists()) {
+            project.delete(dir)
+        }
+    }
+}
+
+/* ============= Cluster testing =============== */
+
+def tomcat1Dir = cuba.tomcat.dir + '1'
+def tomcat2Dir = cuba.tomcat.dir + '2'
+
+task setupTomcat1(type: CubaSetupTomcat) {
+    tomcatRootDir = tomcat1Dir
+}
+
+task setupTomcat2(type: CubaSetupTomcat) {
+    tomcatRootDir = tomcat2Dir
+}
+
+task dropTomcat1(type: CubaDropTomcat) {
+    tomcatRootDir = tomcat1Dir
+    listeningPort = 18787
+}
+
+task dropTomcat2(type: CubaDropTomcat) {
+    tomcatRootDir = tomcat2Dir
+    listeningPort = 28787
+}
+
+task dropTomcatDemo(type: CubaDropTomcat) {
+    tomcatRootDir = cuba.tomcat.dir
+    listeningPort = Integer.valueOf('97' + (demoToken != null ? demoToken : '00'))
+}
+
+task startTomcat1(type: CubaStartTomcat) {
+    tomcatRootDir = tomcat1Dir
+}
+
+task startTomcat2(type: CubaStartTomcat) {
+    tomcatRootDir = tomcat2Dir
+}
+
+configure(coreModule) {
+    task deploy1(dependsOn: assemble, type: CubaDeployment) {
+        tomcatRootDir = tomcat1Dir
+        appName = 'app-core'
+        jarNames = coreJarNames
+    }
+}
+
+configure(webModule) {
+    task deploy1(dependsOn: assemble, type: CubaDeployment) {
+        tomcatRootDir = tomcat1Dir
+        appName = 'app'
+        jarNames = ['app-global', 'app-gui', 'app-web']
+    }
+}
+
+task prepareClusterTest(dependsOn: [subprojects.assemble], description: 'Prepare cluster for tests') {
+    doLast {
+        // Delete
+        dropTomcat1.execute()
+        dropTomcat2.execute()
+
+        // Setup and deploy to first
+        setupTomcat1.execute()
+        coreModule.deploy1.execute()
+        webModule.deploy1.execute()
+
+        copy {
+            from 'tests/cluster/conf/logback.xml'
+            into "$tomcat1Dir/conf"
+        }
+        copy {
+            from 'tests/cluster/conf/app-core.xml'
+            into "$tomcat1Dir/conf/Catalina/localhost"
+        }
+
+        // Copy to second
+        copy {
+            from tomcat1Dir
+            into tomcat2Dir
+        }
+        ant.chmod(osfamily: 'unix', perm: 'a+x') {
+            fileset(dir: "${tomcat2Dir}/bin", includes: '*.sh')
+        }
+
+        setupTomcatConfigFiles(tomcat1Dir, 1)
+        setupTomcatConfigFiles(tomcat2Dir, 2)
+
+        coreModule.createTestDb.execute()
+    }
+}
+
+void setupTomcatConfigFiles(String rootDir, int n) {
+    ant.replace(file: "${rootDir}/conf/server.xml", token: '8005', value: "${n}8005")
+    ant.replace(file: "${rootDir}/conf/server.xml", token: '8009', value: "${n}8009")
+    ant.replace(file: "${rootDir}/conf/server.xml", token: '8080', value: "${n}8080")
+    ant.replace(file: "${rootDir}/bin/setenv.sh", token: '8787', value: "${n}8787")
+    ant.replace(file: "${rootDir}/bin/setenv.bat", token: '8787', value: "${n}8787")
+
+    File coreConfDir = new File("${rootDir}/conf/app-core")
+    coreConfDir.mkdirs()
+    ant.propertyfile(file: new File(coreConfDir, 'local.app.properties').getAbsolutePath()) {
+        entry(key: 'cuba.webPort', value: "${n}8080")
+        entry(key: 'cuba.cluster.enabled', value: 'true')
+        if (Boolean.valueOf(System.getProperty("entityCache"))) {
+            entry(key: 'eclipselink.cache.shared.sec$User', value: 'true')
+            entry(key: 'eclipselink.cache.shared.sec$Group', value: 'true')
+        }
+    }
+
+    File webConfDir = new File("${rootDir}/conf/app")
+    webConfDir.mkdirs()
+    ant.propertyfile(file: new File(webConfDir, 'local.app.properties').getAbsolutePath()) {
+        entry(key: 'cuba.webPort', value: "${n}8080")
+    }
+}
+
+task demoSetup(dependsOn: [coreModule.createDemoDb]) {
+    doLast {
+        def versionPrefix = '00'
+        def dbName = 'refapp_demo'
+        if (demoToken != null) {
+            versionPrefix = demoToken
+            dbName += '_' + versionPrefix
+        }
+
+        ant.replace(file: "${cuba.tomcat.dir}/conf/server.xml", token: '8005', value: "95${versionPrefix}")
+        ant.replace(file: "${cuba.tomcat.dir}/conf/server.xml", token: '8009', value: "99${versionPrefix}")
+        ant.replace(file: "${cuba.tomcat.dir}/conf/server.xml", token: '8080', value: "90${versionPrefix}")
+        ant.replace(file: "${cuba.tomcat.dir}/bin/setenv.sh", token: '8787', value: "97${versionPrefix}")
+        ant.replace(file: "${cuba.tomcat.dir}/bin/setenv.bat", token: '8787', value: "97${versionPrefix}")
+        ant.replace(file: "${cuba.tomcat.dir}/webapps/app-core/META-INF/context.xml", token: 'refapp_6', value: dbName)
+        File coreConfDir = new File("${cuba.tomcat.dir}/conf/app-core")
+        coreConfDir.mkdirs()
+        ant.propertyfile(file: new File(coreConfDir, 'local.app.properties').getAbsolutePath()) {
+            entry(key: 'cuba.webPort', value: "90${versionPrefix}")
+            entry(key: 'reporting.openoffice.path', value: '/usr/lib/libreoffice/program/')
+            entry(key: 'reporting.displayDeviceUnavailable', value: 'true')
+        }
+        File confDir = new File("${cuba.tomcat.dir}/conf/app")
+        confDir.mkdirs()
+        ant.propertyfile(file: new File(confDir, 'local.app.properties').getAbsolutePath()) {
+            entry(key: 'cuba.webPort', value: "90${versionPrefix}")
+            entry(key: 'cuba.connectionUrlList', value: "http://localhost:90${versionPrefix}/app-core")
+        }
+    }
+}
+
+//==============Deploy reports==============
+task deployReports {
+    doLast {
+        def server = javax.management.remote.JMXConnectorFactory.connect(
+                new javax.management.remote.JMXServiceURL('service:jmx:rmi:///jndi/rmi://localhost:7777/jmxrmi'),
+                (Map<String, ?>) [:]).getMBeanServerConnection()
+        def result = server.invoke(javax.management.ObjectName.getInstance('app-core.cuba:type=ReportImportExport'),
+                'deployAllReportsFromPath',
+                ['PATH_TO_FOLDER'] as Object[],
+                [String.class.getName()] as String[])
+        println result
+    }
+}
+
+task buildWar(type: CubaWarBuilding) {
+    appHome = '${catalina.base}/work/app_home'
+    singleWar = false
+    includeJdbcDriver = true
+    includeContextXml = true
+}
+
+task buildSingleWar(type: CubaWarBuilding) {
+    appHome = '${catalina.base}/work/app_home'
+    webXml = "${project(':app-web').projectDir}/web/WEB-INF/single-app-web.xml"
+    coreContextXmlPath = 'modules/core/web/META-INF/single-war-context.xml'
+    includeJdbcDriver = true
+    includeContextXml = true
+}
+
+task deploySingleWar(dependsOn: buildSingleWar, type: Copy) {
+    from file("$buildDir/distributions/war/app.war")
+    into file('../tomcat/webapps/')
+}
+
+task buildUberJar(type: CubaUberJarBuilding) {
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    appProperties = ['cuba.automaticDatabaseUpdate': true]
+    appName = 'app'
+    logbackConfigurationFile = "test-deployment/logback.xml"
+}
+
+task buildSingleUberJar(type: CubaUberJarBuilding) {
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    appProperties = ['cuba.automaticDatabaseUpdate': true]
+    singleJar = true
+    logbackConfigurationFile = "test-deployment/logback.xml"
+}
+
+task copyWarToTomcat(type: Copy) {
+    from "${project.buildDir}/distributions/war"
+    include "*.war"
+    into "${cuba.tomcat.dir}/webapps"
+}
+

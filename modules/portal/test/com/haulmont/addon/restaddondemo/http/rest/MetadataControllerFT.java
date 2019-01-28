@@ -73,7 +73,7 @@ public class MetadataControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("ref$ExtDriver", ctx.read("$.entityName"));
 
-            assertEquals("com.haulmont.refapp.core.entity.DriverStatus", ctx.read("$.properties[?(@.name == 'status')].type", List.class).get(0));
+            assertEquals("com.haulmont.addon.restaddondemo.core.entity.DriverStatus", ctx.read("$.properties[?(@.name == 'status')].type", List.class).get(0));
             assertEquals("ENUM", ctx.read("$.properties[?(@.name == 'status')].attributeType", List.class).get(0));
         }
     }

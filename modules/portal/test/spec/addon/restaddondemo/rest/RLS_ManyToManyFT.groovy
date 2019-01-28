@@ -7,15 +7,15 @@ package spec.addon.restaddondemo.rest
 
 import com.haulmont.cuba.core.sys.persistence.PostgresUUID
 import com.haulmont.cuba.security.entity.ConstraintCheckType
-import com.haulmont.refapp.http.api.DataSet
+import com.haulmont.addon.restaddondemo.http.api.DataSet
 import groovy.sql.Sql
 import org.apache.http.HttpStatus
 import spock.lang.Specification
 
-import static spec.refapp.rest.DbUtils.getSql
+import static spec.addon.restaddondemo.rest.DbUtils.getSql
 import static DataUtils.*
-import static spec.refapp.rest.RestSpecsUtils.createRequest
-import static spec.refapp.rest.RestSpecsUtils.getAuthToken
+import static spec.addon.restaddondemo.rest.RestSpecsUtils.createRequest
+import static spec.addon.restaddondemo.rest.RestSpecsUtils.getAuthToken
 
 class RLS_ManyToManyFT extends Specification {
 

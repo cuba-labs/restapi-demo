@@ -32,8 +32,8 @@ public class EnumsControllerFT extends AbstractRestControllerFT {
             ReadContext ctx = parseResponse(response);
             assertTrue(ctx.read("$.length()", Integer.class) > 1);
 
-            assertEquals(2, (int) ctx.read("$[?(@.name == 'com.haulmont.refapp.core.entity.DriverStatus')].values.length()", List.class).get(0));
-            Map<String, Object> value1 = (Map<String, Object>) ctx.read("$[?(@.name == 'com.haulmont.refapp.core.entity.DriverStatus')].values[0]", JSONArray.class).get(0);
+            assertEquals(2, (int) ctx.read("$[?(@.name == 'com.haulmont.addon.restaddondemo.core.entity.DriverStatus')].values.length()", List.class).get(0));
+            Map<String, Object> value1 = (Map<String, Object>) ctx.read("$[?(@.name == 'com.haulmont.addon.restaddondemo.core.entity.DriverStatus')].values[0]", JSONArray.class).get(0);
             assertEquals("ACTIVE", value1.get("name"));
             assertEquals("Active", value1.get("caption"));
             assertEquals(10, value1.get("id"));
@@ -42,12 +42,12 @@ public class EnumsControllerFT extends AbstractRestControllerFT {
 
     @Test
     public void getEnum() throws Exception {
-        String url = "/metadata/enums/com.haulmont.refapp.core.entity.DriverStatus";
+        String url = "/metadata/enums/com.haulmont.addon.restaddondemo.core.entity.DriverStatus";
         try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
 
-            assertEquals("com.haulmont.refapp.core.entity.DriverStatus", ctx.read("$.name"));
+            assertEquals("com.haulmont.addon.restaddondemo.core.entity.DriverStatus", ctx.read("$.name"));
             assertEquals(2, (int) ctx.read("$.values.length()", Integer.class));
             assertEquals("ACTIVE", ctx.read("$.values[0].name"));
             assertEquals("Active", ctx.read("$.values[0].caption"));
@@ -57,7 +57,7 @@ public class EnumsControllerFT extends AbstractRestControllerFT {
 
     @Test
     public void getNonExistingEnum() throws Exception {
-        String url = "/metadata/enums/com.haulmont.refapp.core.entity.NonExistingEnum";
+        String url = "/metadata/enums/com.haulmont.addon.restaddondemo.core.entity.NonExistingEnum";
         try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
             assertEquals(HttpStatus.SC_NOT_FOUND, statusCode(response));
             ReadContext ctx = parseResponse(response);

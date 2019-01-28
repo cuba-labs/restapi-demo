@@ -16,6 +16,8 @@ buildscript {
     }
 }
 
+
+
 def modulePrefix = 'app'
 
 def globalModule = project(":${modulePrefix}-global")
@@ -41,12 +43,14 @@ cuba {
 dependencies {
     appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
     appComponent("com.haulmont.bpm:bpm-global:$cubaVersion")
+    appComponent("com.haulmont.reports:reports-global:$cubaVersion")
 }
 
 def postgres = 'org.postgresql:postgresql:42.2.4'
 
 configure([globalModule, coreModule, webModule, portalModule]) {
     apply(plugin: 'java')
+    apply(plugin: 'groovy')
     apply(plugin: 'maven')
     apply(plugin: 'cuba')
 
@@ -54,14 +58,19 @@ configure([globalModule, coreModule, webModule, portalModule]) {
         testCompile('junit:junit:4.12')
         testCompile('org.jmockit:jmockit:1.39')
         testCompile('org.spockframework:spock-core:1.2-groovy-2.5')
+        
+
         // New http client needed for running selenium tests
-        compile('org.apache.httpcomponents:httpcore:4.4.10')
+        testCompile('org.apache.httpcomponents:httpcore:4.4.10'){
+            exclude(group: 'org.codehaus.groovy', module: 'groovy-all')
+        }
     }
 
     sourceSets {
         test {
-            java {
-                srcDirs = ['test']
+            groovy {
+                include 'spec/**'
+                srcDir 'test'
             }
         }
     }
@@ -96,6 +105,9 @@ configure(coreModule) {
         compileOnly(servletApi)
         jdbc(postgres)
         testRuntime(postgres)
+
+        testCompile("httpunit:httpunit:1.7")
+        testCompile("rhino:js:1.7R2")
     }
 
     task cleanConf(description: 'Cleans up conf directory') {
@@ -189,6 +201,12 @@ configure(portalModule) {
         testCompile('org.apache.httpcomponents:fluent-hc:4.5.2')
         testCompile('org.apache.httpcomponents:httpmime:4.5.2')
         testCompile('io.rest-assured:rest-assured:3.0.7')
+        testCompile('com.squareup.retrofit2:converter-scalars:2.4.0')
+
+        testCompile('org.postgresql:postgresql:42.2.4')
+
+        testCompile("httpunit:httpunit:1.7")
+        testCompile("rhino:js:1.7R2")
     }
 
     def webappName = "${modulePrefix}-portal"
@@ -256,3 +274,4 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
     }
 }
 
+apply from: 'extra.gradle'

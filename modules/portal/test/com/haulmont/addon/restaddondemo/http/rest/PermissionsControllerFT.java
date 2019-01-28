@@ -50,7 +50,7 @@ public class PermissionsControllerFT {
     @Before
     public void setUp() throws Exception {
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
         prepareDb();
         oauthToken = getAuthToken(testUserLogin, testUserPassword);
     }

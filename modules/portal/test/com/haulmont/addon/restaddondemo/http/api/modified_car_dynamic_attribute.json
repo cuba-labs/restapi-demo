@@ -1,0 +1,9 @@
+{
+    commitInstances: [{
+            id: $ENTITY-TO_BE_REPLACED_ID$,
+            "+attribute1": "Modified dynamic attribute",
+            "+attribute2" : { "id":"$ENTITY-TO_BE_REPLACED_ID$"},
+            "+attribute3": "3"
+        }
+    ]
+}

@@ -1,2 +1,0 @@
-alter table REF_IK_ORDER add constraint FK_REF_IK_ORDER_ON_CUSTOMER foreign key (CUSTOMER_ID) references REF_IK_CUSTOMER(ID);
-create index IDX_REF_IK_ORDER_ON_CUSTOMER on REF_IK_ORDER (CUSTOMER_ID);

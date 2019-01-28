@@ -11,7 +11,7 @@ import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.entity.annotation.SystemLevel;
 import com.haulmont.cuba.core.global.DeletePolicy;
-import com.haulmont.addon.restaddondemo.core.entity.multidb.Db1Customer;
+
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -43,9 +43,9 @@ public class Repair extends StandardEntity {
     @OnDelete(DeletePolicy.CASCADE)
     private Set<CarToken> carTokens;
 
-    @Transient
-    @MetaProperty(related = "db1CustomerId")
-    private Db1Customer db1Customer;
+//    @Transient
+//    @MetaProperty(related = "db1CustomerId")
+//    private Db1Customer db1Customer;
 
     @SystemLevel
     @Column(name = "DB1_CUSTOMER_ID")
@@ -91,13 +91,13 @@ public class Repair extends StandardEntity {
         this.insuranceCase = insuranceCase;
     }
 
-    public Db1Customer getDb1Customer() {
-        return db1Customer;
-    }
-
-    public void setDb1Customer(Db1Customer db1Customer) {
-        this.db1Customer = db1Customer;
-    }
+//    public Db1Customer getDb1Customer() {
+//        return db1Customer;
+//    }
+//
+//    public void setDb1Customer(Db1Customer db1Customer) {
+//        this.db1Customer = db1Customer;
+//    }
 
     public Long getDb1CustomerId() {
         return db1CustomerId;

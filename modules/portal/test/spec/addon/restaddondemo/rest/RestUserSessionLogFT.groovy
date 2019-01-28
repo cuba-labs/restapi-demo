@@ -5,7 +5,7 @@
 
 package spec.addon.restaddondemo.rest
 
-import spec.refapp.rest.jmx.UserSessionLogService
+import spec.addon.restaddondemo.rest.jmx.UserSessionLogService
 import spock.lang.Specification
 
 import static com.haulmont.masquerade.Connectors.*

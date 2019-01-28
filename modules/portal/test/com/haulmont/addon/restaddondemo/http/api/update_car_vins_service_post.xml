@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2008-2016 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<ServiceRequest xmlns="http://schemas.haulmont.com/cuba/restapi-service-v2.xsd">
+    <service>refapp_PortalTestService</service>
+    <method>updateCarVins</method>
+    <view>carEdit</view>
+    <params>
+        <param name="param0">
+            <instances>
+                <instance id="ref_Car-$CAR_ID_1$">
+                    <field name="vin">$CAR_VIN_1$</field>
+                    <reference name="colour">
+                        <instance id="ref$Colour-$COLOUR_ID$">
+                            <field name="name">$COLOUR_NAME$</field>
+                        </instance>
+                    </reference>
+                    <collection name="driverAllocations">
+                        <instance id="ref$DriverAllocation-$DRIVER_ALLOCATION_ID_1$"/>
+                        <instance id="ref$DriverAllocation-$DRIVER_ALLOCATION_ID_2$"/>
+                    </collection>
+                    <collection name="repairs">
+                        <instance id="ref$Repair-$REPAIR_ID_1$"/>
+                        <instance id="ref$Repair-$REPAIR_ID_2$"/>
+                    </collection>
+                </instance>
+                <instance id="ref_Car-$CAR_ID_2$">
+                    <field name="vin">$CAR_VIN_2$</field>
+                </instance>
+            </instances>
+        </param>
+        <param name="param1">$CAR_NEW_VIN$</param>
+    </params>
+</ServiceRequest>

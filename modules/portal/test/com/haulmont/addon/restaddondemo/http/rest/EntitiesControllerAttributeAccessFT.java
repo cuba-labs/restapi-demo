@@ -452,7 +452,7 @@ public class EntitiesControllerAttributeAccessFT {
 
     private void prepareDb() throws Exception {
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
         createDbData();
         createDbUsers();
     }

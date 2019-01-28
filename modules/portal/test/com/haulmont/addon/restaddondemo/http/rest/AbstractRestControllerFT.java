@@ -29,7 +29,7 @@ public abstract class AbstractRestControllerFT {
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
         prepareDb();
     }
 

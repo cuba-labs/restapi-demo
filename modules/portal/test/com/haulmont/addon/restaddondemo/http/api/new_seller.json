@@ -1,0 +1,7 @@
+{
+    commitInstances: [{
+        id: $ENTITY-TO_BE_REPLACED_ID$,
+        name: "Rolf"
+        }
+    ]
+}

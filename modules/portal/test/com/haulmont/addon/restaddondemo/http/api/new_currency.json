@@ -1,0 +1,8 @@
+{
+    commitInstances: [{
+        id: "NEW-ref$Currency-{usd}",
+        code: "usd",
+        name: "US Dollars"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    commitInstances: [{
+        id: $ENTITY-TO_BE_REPLACED_ID$,
+        car: {
+            id: $CAR-TO_BE_REPLACED_ID$
+        },
+        date: null
+        }
+    ]
+}

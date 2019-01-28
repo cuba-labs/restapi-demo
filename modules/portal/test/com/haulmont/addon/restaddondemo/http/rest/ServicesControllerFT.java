@@ -48,7 +48,7 @@ public class ServicesControllerFT {
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
         prepareDb();
     }
 
@@ -709,8 +709,9 @@ public class ServicesControllerFT {
     private void prepareDb() throws SQLException {
         UUID colourId = dirtyData.createColourUuid();
         colourUuidString = colourId.toString();
-        executePrepared("insert into ref_colour(id, name) values (?, ?)",
+        executePrepared("insert into ref_colour(id, version, name) values (?, ?, ?)",
                 new PostgresUUID(colourId),
+                1L,
                 "Red");
 
         UUID carUuid = dirtyData.createCarUuid();
@@ -733,10 +734,12 @@ public class ServicesControllerFT {
 
         UUID repairId = dirtyData.createRepairUuid();
         repairUuidString = repairId.toString();
-        executePrepared("insert into ref_repair(id, car_id, repair_date) values (?, ?, ?)",
+        executePrepared("insert into ref_repair(id, car_id, repair_date, version) values (?, ?, ?, ?)",
                 new PostgresUUID(repairId),
                 new PostgresUUID(carUuid),
-                java.sql.Date.valueOf("2012-01-13"));
+                java.sql.Date.valueOf("2012-01-13"),
+                1L
+                );
 
 
         dirtyData.createRepairUuid();

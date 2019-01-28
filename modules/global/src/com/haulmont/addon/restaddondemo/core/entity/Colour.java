@@ -18,10 +18,10 @@ public class Colour extends StandardEntity {
 
     private static final long serialVersionUID = -6966135766799019463L;
 
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "NAME")
     private String name;
 
-    @Column(name = "DESCRIPTION", nullable = false)
+    @Column(name = "DESCRIPTION")
     private String description;
 
     public String getName() {

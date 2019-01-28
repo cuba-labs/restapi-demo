@@ -6,9 +6,9 @@
 package spec.addon.restaddondemo.rest
 
 import com.haulmont.masquerade.restapi.ServiceGenerator
-import spec.refapp.rest.jmx.UserSessionsSupportJmxService
-import spec.refapp.rest.service.LdapTokenService
-import spec.refapp.rest.service.UserInfoService
+import spec.addon.restaddondemo.rest.jmx.UserSessionsSupportJmxService
+import spec.addon.restaddondemo.rest.service.LdapTokenService
+import spec.addon.restaddondemo.rest.service.UserInfoService
 import spock.lang.Specification
 
 import static com.haulmont.masquerade.Connectors.*

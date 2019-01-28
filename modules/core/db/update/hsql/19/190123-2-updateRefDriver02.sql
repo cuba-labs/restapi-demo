@@ -1,2 +1,0 @@
-alter table REF_DRIVER add constraint FK_REF_DRIVER_ON_CALLSIGN foreign key (CALLSIGN_ID) references REF_DRIVER_CALLSIGN(ID);
-create index IDX_REF_DRIVER_ON_CALLSIGN on REF_DRIVER (CALLSIGN_ID);

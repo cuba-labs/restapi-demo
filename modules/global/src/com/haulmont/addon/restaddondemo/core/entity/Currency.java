@@ -28,7 +28,7 @@ public class Currency extends BaseStringIdEntity implements Versioned, Creatable
     @Id
     @Column(name = "CODE")
     @Size(min = 3)
-    @NotNull(message = "{msg://com.haulmont.refapp.core.entity/Currency.code.empty}")
+    @NotNull(message = "{msg://com.haulmont.addon.restaddondemo.core.entity/Currency.code.empty}")
     protected String code;
 
     @Column(name = "UUID")

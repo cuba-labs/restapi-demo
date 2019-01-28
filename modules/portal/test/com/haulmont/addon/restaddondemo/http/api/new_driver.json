@@ -1,0 +1,13 @@
+{
+    commitInstances: [{
+            id: $ENTITY-TO_BE_REPLACED_ID$,
+            name: Sam Smith,
+            status: null,
+            address: {
+                country: USA,
+                state: TX,
+                city: Austin
+            }
+        }
+    ]
+}

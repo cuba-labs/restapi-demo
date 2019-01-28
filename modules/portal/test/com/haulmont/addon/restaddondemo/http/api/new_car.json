@@ -1,0 +1,8 @@
+{
+    commitInstances: [{
+        id: $ENTITY-TO_BE_REPLACED_ID$,
+        vin: VWV111,
+        version: 1
+        }
+    ]
+}

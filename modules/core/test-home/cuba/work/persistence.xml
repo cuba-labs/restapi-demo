@@ -56,6 +56,51 @@
     <class>com.haulmont.cuba.core.entity.JmxInstance</class>
     <class>com.haulmont.cuba.security.entity.RememberMeToken</class>
     <class>com.haulmont.cuba.core.entity.ReferenceToEntity</class>
+    <class>com.haulmont.bpm.entity.ProcDefinition</class>
+    <class>com.haulmont.bpm.entity.ProcRole</class>
+    <class>com.haulmont.bpm.entity.ProcInstance</class>
+    <class>com.haulmont.bpm.entity.ProcActor</class>
+    <class>com.haulmont.bpm.entity.ProcTask</class>
+    <class>com.haulmont.bpm.entity.ProcAttachmentType</class>
+    <class>com.haulmont.bpm.entity.ProcAttachment</class>
+    <class>com.haulmont.bpm.entity.ProcModel</class>
+    <class>com.haulmont.bpm.entity.StencilSet</class>
+    <class>com.haulmont.reports.entity.ReportTemplate</class>
+    <class>com.haulmont.reports.entity.Report</class>
+    <class>com.haulmont.reports.entity.ReportGroup</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Address</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Colour</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Model</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Plant</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Driver</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.DriverCallsign</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.DriverGroup</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.CarToken</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Car</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.CarGarageToken</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.CarDetails</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.CarDocumentation</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.CarDetailsItem</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.DriverAllocation</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Repair</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.InsuranceCase</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Doc</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.DriverLicense</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Place</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Seller</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Currency</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.Card</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.SamplePlatformEntity</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.identity.IdentityCustomer</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.identity.IdentityOrder</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.identity.IdentityOrderLine</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.identity.IdentityOrderLineTag</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKey</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKeyBaseEntity</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKeyCustomer</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKeyOrder</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKeyOrderLine</class>
+    <class>com.haulmont.addon.restaddondemo.core.entity.compkey.CompKeyOrderLineTag</class>
     <exclude-unlisted-classes/>
     <properties>
       <property name="eclipselink.cache.coordination.propagate-asynchronously" value="false"/>
@@ -63,7 +108,7 @@
       <property name="eclipselink.logging.logger" value="com.haulmont.cuba.core.sys.logging.EclipseLinkLog"/>
       <property name="eclipselink.cache.shared.default" value="false"/>
       <property name="eclipselink.flush-clear.cache" value="Merge"/>
-      <property name="eclipselink.target-database" value="com.haulmont.cuba.core.sys.persistence.CubaPostgreSQLPlatform"/>
+      <property name="eclipselink.target-database" value="com.haulmont.cuba.core.sys.persistence.CubaHSQLPlatform"/>
       <property name="javax.persistence.validation.mode" value="NONE"/>
       <property name="eclipselink.cache.coordination.protocol" value="com.haulmont.cuba.core.sys.entitycache.EntityCacheTransportManager"/>
       <property name="eclipselink.weaving" value="static"/>

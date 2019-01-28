@@ -11,4 +11,17 @@
     
     <gui:screens base-packages="com.haulmont.addon.restaddondemo.web"/>
 
+    <!-- Remote stubs -->
+
+    <bean id="ref_proxyCreator" class="com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator">
+        <property name="serverSelector" ref="cuba_ServerSelector"/>
+        <property name="remoteServices">
+            <map>
+                <!--<entry key="refapp_SampleService" value="com.haulmont.refapp.core.app.SampleService"/>-->
+                <!--<entry key="cuba_TestingService" value="com.haulmont.refapp.core.app.RefAppTestingService"/>-->
+                <entry key="refapp_PortalTestService" value="com.haulmont.addon.restaddondemo.core.app.PortalTestService"/>
+            </map>
+        </property>
+    </bean>
+
 </beans>

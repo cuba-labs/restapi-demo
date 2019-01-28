@@ -1,0 +1,8 @@
+{
+  commitInstances: [{
+    "id": $ENTITY-TO_BE_REPLACED_ID$-_local,
+    "name": null,
+    "numberOfSeats": null
+  }
+  ]
+}

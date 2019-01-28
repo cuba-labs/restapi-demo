@@ -6,7 +6,7 @@
 package spec.addon.restaddondemo.rest
 
 import com.haulmont.masquerade.restapi.ServiceGenerator
-import spec.refapp.rest.service.NotFoundUrlService
+import spec.addon.restaddondemo.rest.service.NotFoundUrlService
 import spock.lang.Specification
 
 import static com.haulmont.masquerade.Connectors.RestApiHost

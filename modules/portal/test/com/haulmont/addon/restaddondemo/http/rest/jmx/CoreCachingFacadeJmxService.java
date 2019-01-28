@@ -7,7 +7,7 @@ package com.haulmont.addon.restaddondemo.http.rest.jmx;
 
 import com.haulmont.masquerade.jmx.JmxName;
 
-@JmxName("app-core.cuba:type=CachingFacade")
+@JmxName("app.cuba:type=CachingFacade")
 public interface CoreCachingFacadeJmxService {
     void clearDynamicAttributesCache();
 }

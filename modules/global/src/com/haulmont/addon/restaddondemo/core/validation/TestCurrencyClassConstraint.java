@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestCurrencyClassConstraint {
-    String message() default "{msg://com.haulmont.refapp.core.validation/TestCurrencyClassConstraint.message}";
+    String message() default "{msg://com.haulmont.addon.restaddondemo.core.validation/TestCurrencyClassConstraint.message}";
 
     Class<?>[] groups() default {};
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--
+  ~ Copyright (c) 2008-2016 Haulmont. All rights reserved.
+  ~ Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
+  -->
+
+<views xmlns="http://www.haulmont.com/schema/cuba/view.xsd">
+    <view class="com.haulmont.refapp.core.entity.Car" name="car.noVinListData">
+        <property name="model" view="_minimal"/>
+        <property name="colour" view="_minimal"/>
+    </view>
+</views>

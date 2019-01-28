@@ -35,7 +35,7 @@ class RestReportFT extends Specification {
     void setup() {
         //import reports using jmx bean
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        IOUtils.copy(RestReportFT.class.getResourceAsStream('/spec/refapp/rest/Reports.zip'), outputStream)
+        IOUtils.copy(RestReportFT.class.getResourceAsStream('/spec/addon/restaddondemo/rest/Reports.zip'), outputStream)
         Connectors.jmx(ImportReportsService.class).importReports(outputStream.toByteArray())
 
         sql = getSql() as Sql
