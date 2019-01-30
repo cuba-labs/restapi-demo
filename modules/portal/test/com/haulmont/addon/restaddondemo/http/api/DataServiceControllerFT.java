@@ -140,7 +140,7 @@ public class DataServiceControllerFT {
                 "Attribute 2",
                 "attribute2",
                 "ENTITY",
-                "com.haulmont.refapp.core.entity.Car",
+                "com.haulmont.addon.restaddondemo.core.entity.Car",
                 false
         );
 
@@ -227,13 +227,14 @@ public class DataServiceControllerFT {
 
         UUID caseId = dirtyData.createCaseUuid();
         caseUuidString = caseId.toString();
-        executePrepared("insert into debt_case(id, test1, test2, test3, test4, debtor_id) values (?, ?, ?, ?, ?, ?)",
+        executePrepared("insert into debt_case(id, test1, test2, test3, test4, debtor_id, version) values (?, ?, ?, ?, ?, ?, ?)",
                 new PostgresUUID(caseId),
                 "test1",
                 "test2",
                 "test3",
                 "test4",
-                new PostgresUUID(debtorId));
+                new PostgresUUID(debtorId),
+                1L);
     }
 
     private void assignModelToCar() throws Exception {

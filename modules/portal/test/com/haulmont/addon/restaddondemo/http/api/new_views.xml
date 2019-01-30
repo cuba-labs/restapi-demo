@@ -6,7 +6,7 @@
   -->
 
 <views xmlns="http://www.haulmont.com/schema/cuba/view.xsd">
-    <view class="com.haulmont.refapp.core.entity.Car" name="car.noVinListData">
+    <view class="com.haulmont.addon.restaddondemo.core.entity.Car" name="car.noVinListData">
         <property name="model" view="_minimal"/>
         <property name="colour" view="_minimal"/>
     </view>

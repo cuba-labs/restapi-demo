@@ -17,8 +17,6 @@
         <property name="serverSelector" ref="cuba_ServerSelector"/>
         <property name="remoteServices">
             <map>
-                <!--<entry key="refapp_SampleService" value="com.haulmont.refapp.core.app.SampleService"/>-->
-                <!--<entry key="cuba_TestingService" value="com.haulmont.refapp.core.app.RefAppTestingService"/>-->
                 <entry key="refapp_PortalTestService" value="com.haulmont.addon.restaddondemo.core.app.PortalTestService"/>
             </map>
         </property>

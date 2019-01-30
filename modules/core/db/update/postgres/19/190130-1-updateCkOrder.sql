@@ -1,0 +1,1 @@
+drop index IDX_REF_CK_ORDER_ON_CUTEIDCUENID ;

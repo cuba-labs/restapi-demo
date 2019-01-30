@@ -10,8 +10,14 @@
                   format="0.####" decimalSeparator="." groupingSeparator=""/>
     </datatypes>
 
-    <metadata-model root-package="com.haulmont.addon.restaddondemo" namespace="restaddondemo"/>
+    <!--<metadata-model root-package="com.haulmont.addon.restaddondemo" namespace="restaddondemo"/>-->
 
-
+    <metadata-model namespace="ref"
+                    root-package="com.haulmont.addon.restaddondemo">
+        <class>com.haulmont.addon.restaddondemo.core.entity.TransientDriver</class>
+        <class>com.haulmont.addon.restaddondemo.core.entity.RefappNotPersistentStringIdEntity</class>
+        <class store="mem1">com.haulmont.addon.restaddondemo.core.entity.multidb.Mem1Customer</class>
+        <class store="mem1">com.haulmont.addon.restaddondemo.core.entity.multidb.Mem1LongIdEntity</class>
+    </metadata-model>
 
 </metadata>

@@ -551,3 +551,12 @@ create table DEBT_DEBTOR (
     primary key (ID)
 )^
 -- end DEBT_DEBTOR
+------------------------------------------------------------------------------------------------------------
+create view REF_ALLOCATED_CAR as
+select c.ID, c.CREATE_TS, c.CREATED_BY, c.VIN, c.MODEL_ID, cl.NAME as COLOUR_NAME, d.NAME as DRIVER_NAME, a.CREATE_TS as ALLOC_TS
+from REF_CAR c
+	join REF_DRIVER_ALLOC a on a.CAR_ID = c.ID
+	join REF_DRIVER d on d.ID = a.DRIVER_ID
+	left join REF_COLOUR cl on cl.ID = c.COLOUR_ID
+where a.CREATE_TS = (select max(a1.CREATE_TS) from REF_DRIVER_ALLOC a1 where a1.CAR_ID = c.ID)^
+------------------------------------------------------------------------------------------------------------

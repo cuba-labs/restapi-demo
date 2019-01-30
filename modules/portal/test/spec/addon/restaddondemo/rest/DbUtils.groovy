@@ -10,6 +10,6 @@ import groovy.sql.Sql
 class DbUtils {
     static Sql getSql() {
         return Sql.newInstance('jdbc:postgresql://localhost/refapp_6',
-                'root', 'root', 'org.postgresql.Driver')
+                'cuba', 'cuba', 'org.postgresql.Driver')
     }
 }

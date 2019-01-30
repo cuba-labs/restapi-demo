@@ -25,11 +25,14 @@
         <class>com.haulmont.addon.restaddondemo.core.entity.Place</class>
         <class>com.haulmont.addon.restaddondemo.core.entity.Seller</class>
         <class>com.haulmont.addon.restaddondemo.core.entity.Currency</class>
-
+        <class>com.haulmont.addon.restaddondemo.core.entity.AllocatedCar</class>
         <class>com.haulmont.addon.restaddondemo.core.entity.Card</class>
 
 
         <class>com.haulmont.addon.restaddondemo.core.entity.SamplePlatformEntity</class>
+
+        <class>com.haulmont.addon.restaddondemo.core.entity.Debtor</class>
+        <class>com.haulmont.addon.restaddondemo.core.entity.Case</class>
 
 
         <class>com.haulmont.addon.restaddondemo.core.entity.identity.IdentityCustomer</class>

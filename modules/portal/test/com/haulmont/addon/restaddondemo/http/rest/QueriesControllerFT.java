@@ -234,7 +234,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
         try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             assertEquals("application/json;charset=UTF-8", responseContentType(response));
-            assertEquals("3", responseToString(response));
+            assertEquals("2", responseToString(response));
         }
     }
 

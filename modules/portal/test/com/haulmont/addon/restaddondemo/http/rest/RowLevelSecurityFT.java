@@ -264,7 +264,7 @@ public class RowLevelSecurityFT {
 
     private void prepareDb() throws Exception {
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
 
         groupId = dirtyData.createGroupUuid();
         executePrepared("insert into sec_group(id, version, name) " +

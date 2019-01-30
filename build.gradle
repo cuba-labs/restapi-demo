@@ -72,6 +72,9 @@ configure([globalModule, coreModule, webModule, portalModule]) {
                 include 'spec/**'
                 srcDir 'test'
             }
+            java{
+                srcDir 'test'
+            }
         }
     }
 
@@ -108,6 +111,14 @@ configure(coreModule) {
 
         testCompile("httpunit:httpunit:1.7")
         testCompile("rhino:js:1.7R2")
+
+        jdbc('org.hsqldb:hsqldb:2.3.3')
+        testRuntime('org.hsqldb:hsqldb:2.3.3')
+
+        compile('org.apache.directory.server:apacheds-protocol-ldap:2.0.0.AM25')
+        compile('org.apache.directory.server:apacheds-core-annotations:2.0.0.AM25')
+        compile('org.apache.directory.server:apacheds-ldif-partition:2.0.0.AM25')
+        compile('org.apache.directory.api:api-ldap-codec-standalone:2.0.0.AM2')
     }
 
     task cleanConf(description: 'Cleans up conf directory') {

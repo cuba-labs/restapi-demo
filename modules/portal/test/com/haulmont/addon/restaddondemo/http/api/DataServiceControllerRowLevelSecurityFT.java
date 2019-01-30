@@ -65,7 +65,7 @@ public class DataServiceControllerRowLevelSecurityFT {
         conv = new WebConversation();
 
         Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        conn = DriverManager.getConnection(DB_URL, "cuba", "cuba");
 
         prepareDb();
 
@@ -107,16 +107,18 @@ public class DataServiceControllerRowLevelSecurityFT {
 
         UUID repair1Uuid = dirtyData.createRepairUuid();
         repair1UuidString = repair1Uuid.toString();
-        executePrepared("insert into ref_repair(id, car_id, repair_date) values (?, ?, ?)",
+        executePrepared("insert into ref_repair(id, car_id, version, repair_date) values (?, ?, ?, ?)",
                 new PostgresUUID(repair1Uuid),
                 new PostgresUUID(redCarUuid),
+                1L,
                 java.sql.Date.valueOf("2012-01-13"));
 
         UUID repair2Uuid = dirtyData.createRepairUuid();
         repair2UuidString = repair2Uuid.toString();
-        executePrepared("insert into ref_repair(id, car_id, repair_date) values (?, ?, ?)",
+        executePrepared("insert into ref_repair(id, car_id, version, repair_date) values (?, ?, ?, ?)",
                 new PostgresUUID(repair2Uuid),
                 new PostgresUUID(redCarUuid),
+                1L,
                 java.sql.Date.valueOf("2012-02-13"));
 
         UUID constraintId = dirtyData.createConstraintId();
