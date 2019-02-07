@@ -15,7 +15,7 @@ import static com.haulmont.masquerade.Connectors.*
 
 class TokenSessionExpiredResponseFT extends Specification {
 
-    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/rest/v2/'
+    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/restv2/v2/'
 
     def "PL-10535 Exception when session associated with access token is expired"() {
         def userSessionsSupportJmx = jmx(UserSessionsSupportJmxService.class)

@@ -20,6 +20,7 @@
             com.haulmont.cuba
             com.haulmont.bpm
             com.haulmont.reports
+            com.haulmont.addon.restv2
         </param-value>
     </context-param>
     <listener>

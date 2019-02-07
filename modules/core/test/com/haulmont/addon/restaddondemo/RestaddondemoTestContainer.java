@@ -21,6 +21,7 @@ public class RestaddondemoTestContainer extends TestContainer {
                 // "com.haulmont.fts",
                  "com.haulmont.reports"
                 // and custom app components if any
+//                "com.haulmont.addon.restv2"
         ));
         appPropertiesFiles = Arrays.asList(
                 // List the files defined in your web.xml

@@ -1,9 +1,0 @@
-{
-    commitInstances: [{
-        id: $ENTITY-TO_BE_REPLACED_ID$,
-        name: green,
-        description: green,
-        __securityToken: "$SECURITY_TOKEN$"
-        }
-    ]
-}

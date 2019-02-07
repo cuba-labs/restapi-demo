@@ -31,7 +31,7 @@ import static org.apache.http.HttpStatus.SC_OK;
  */
 public class RestTestUtils {
 
-    protected static final String URI_BASE = "http://localhost:8080/app/rest/v2";
+    protected static final String URI_BASE = "http://localhost:8080/app/restv2/v2";
 
     protected static final String CLIENT_ID = "client";
     protected static final String CLIENT_SECRET = "secret";

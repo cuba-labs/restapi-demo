@@ -32,7 +32,7 @@ public class PortalRestApiFT {
 
     protected static final String CLIENT_ID = "client";
     protected static final String CLIENT_SECRET = "secret";
-    protected static final String PORTAL_URI_BASE = "http://localhost:8080/app-portal/rest/v2";
+    protected static final String PORTAL_URI_BASE = "http://localhost:8080/app-portal/restv2/v2";
 
     /**
      * Checks that entities controller in the portal app is available

@@ -2,11 +2,19 @@
 buildscript {
     ext.cubaVersion = '7.0-SNAPSHOT'
     repositories {
-        maven {
-            url "http://repository.haulmont.com:8587/nexus/content/groups/work"
-            credentials {
-                username System.getenv('HAULMONT_REPOSITORY_USER')
-                password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+        mavenLocal()
+        if (System.getenv('HAULMONT_REPOSITORY_URL')) {
+            maven {
+                credentials {
+                    username System.getenv('HAULMONT_REPOSITORY_USER')
+                    password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+                }
+                url System.getenv('HAULMONT_REPOSITORY_URL')
+            }
+        } else {
+            jcenter()
+            maven {
+                url "https://dl.bintray.com/cuba-platform/main" 
             }
         }
         
@@ -44,6 +52,7 @@ dependencies {
     appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
     appComponent("com.haulmont.bpm:bpm-global:$cubaVersion")
     appComponent("com.haulmont.reports:reports-global:$cubaVersion")
+    appComponent("com.haulmont.addon.restv2:restv2-global:0.1-SNAPSHOT")
 }
 
 def postgres = 'org.postgresql:postgresql:42.2.4'
@@ -55,8 +64,8 @@ configure([globalModule, coreModule, webModule, portalModule]) {
     apply(plugin: 'cuba')
 
     dependencies {
-        testCompile('junit:junit:4.12')
         testCompile('org.jmockit:jmockit:1.39')
+        testCompile('junit:junit:4.12')
         testCompile('org.spockframework:spock-core:1.2-groovy-2.5')
         
 
@@ -162,6 +171,11 @@ configure(webModule) {
     dependencies {
         compileOnly(servletApi)
         compile(globalModule)
+
+        testCompile('com.haulmont.masquerade:masquerade-connector:1.0-SNAPSHOT')
+        testCompile('com.haulmont.masquerade:masquerade-web:1.0-SNAPSHOT')
+        
+        testCompile('junit:junit:4.12')
     }
 
     task webArchive(type: Zip) {

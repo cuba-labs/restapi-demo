@@ -11,7 +11,7 @@ import spock.lang.Specification
 import static com.haulmont.masquerade.Connectors.*
 
 class RestUserSessionLogFT extends Specification {
-    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/rest/v2/'
+    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/restv2/v2/'
 
     def "UserSessionLog registers login / logout in REST-API"() {
         def userSessionLogSupportJmx = jmx(UserSessionLogService.class)

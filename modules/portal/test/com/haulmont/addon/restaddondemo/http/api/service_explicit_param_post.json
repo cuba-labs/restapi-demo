@@ -1,8 +1,0 @@
-{
-  "service": "refapp_PortalTestService",
-  "method": "overloadedMethod",
-  "params": {
-    "param0": "Hello",
-    "param0_type": "java.lang.String"
-  }
-}

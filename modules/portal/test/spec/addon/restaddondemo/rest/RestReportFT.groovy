@@ -64,124 +64,124 @@ class RestReportFT extends Specification {
         }
     }
 
-    def """Get reports"""() {
-        when:
+//    def """Get reports"""() {
+//        when:
+//
+//        def request = createRequest(userToken)
+//
+//        def response = request.with().get("/report")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .body('name', hasItems('User Report #1'))
+//                .body('name', not(hasItems('User Report #2', 'User Report #3')))
+//    }
 
-        def request = createRequest(userToken)
+//    def "Get single report"() {
+//        when:
+//
+//        def request = createRequest(userToken)
+//
+//        def response = request.with().get("/report/$report1Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .body('name', equalTo('User Report #1'))
+//                .body('templates.code', hasItem('DEFAULT'))
+//                .body('inputParameters.name', hasItem('User'))
+//                .body('inputParameters.type', hasItem('ENTITY_LIST'))
+//                .body('inputParameters.entityMetaClass', hasItem('sec$User'))
+//                .body('inputParameters.alias', hasItem('entities'))
+//    }
 
-        def response = request.with().get("/report")
+//    def "Get single report without user access rights"() {
+//        when:
+//
+//        def request = createRequest(userToken)
+//
+//        def response = request.with().get("/report/$report2Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_NOT_FOUND)
+//
+//        when:
+//
+//        request = createRequest(userToken)
+//
+//        response = request.with().get("/report/$report3Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_NOT_FOUND)
+//    }
 
-        then:
-
-        response.then().statusCode(HttpStatus.SC_OK)
-                .body('name', hasItems('User Report #1'))
-                .body('name', not(hasItems('User Report #2', 'User Report #3')))
-    }
-
-    def "Get single report"() {
-        when:
-
-        def request = createRequest(userToken)
-
-        def response = request.with().get("/report/$report1Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_OK)
-                .body('name', equalTo('User Report #1'))
-                .body('templates.code', hasItem('DEFAULT'))
-                .body('inputParameters.name', hasItem('User'))
-                .body('inputParameters.type', hasItem('ENTITY_LIST'))
-                .body('inputParameters.entityMetaClass', hasItem('sec$User'))
-                .body('inputParameters.alias', hasItem('entities'))
-    }
-
-    def "Get single report without user access rights"() {
-        when:
-
-        def request = createRequest(userToken)
-
-        def response = request.with().get("/report/$report2Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_NOT_FOUND)
-
-        when:
-
-        request = createRequest(userToken)
-
-        response = request.with().get("/report/$report3Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_NOT_FOUND)
-    }
-
-    def "Run report"() {
-        when:
-
-        def body = ['parameters':
-                            [
-                                    [
-                                            'name' : 'entities',
-                                            'values': [userId.toString()]
-                                    ]
-                            ]
-
-        ]
-
-        def request = createRequest(userToken).body(body)
-
-        def response = request.with().post("/run/$report1Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_OK)
-                .assertThat().header("Content-Disposition", containsString("filename=\"" + URLEncodeUtils.encodeUtf8("Report for entity \"User\".docx") + "\""))
-        response.then().statusCode(HttpStatus.SC_OK)
-                .assertThat().header("Content-Disposition", containsString("inline"))
-
-        when:
-
-        body = ['attachment' : 'true',
-                'parameters':
-                            [
-                                    [
-                                            'name' : 'entities',
-                                            'values': [userId.toString()]
-                                    ]
-                            ]
-        ]
-
-        request = createRequest(userToken).body(body)
-
-        response = request.with().post("/run/$report1Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_OK)
-                .assertThat().header("Content-Disposition", containsString("filename=\"" + URLEncodeUtils.encodeUtf8("Report for entity \"User\".docx") + "\""))
-        response.then().statusCode(HttpStatus.SC_OK)
-                .assertThat().header("Content-Disposition", containsString("attachment"))
-    }
-
-    def "Run report without required params"() {
-        when:
-
-        def body = ['attachment' : 'true',
-                'parameters': []
-        ]
-
-        def request = createRequest(userToken).body(body)
-
-        def response = request.with().post("/run/$report1Id")
-
-        then:
-
-        response.then().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR)
-                .assertThat().body("details", containsString("Required report parameter \"entities\" not found"))
-    }
+//    def "Run report"() {
+//        when:
+//
+//        def body = ['parameters':
+//                            [
+//                                    [
+//                                            'name' : 'entities',
+//                                            'values': [userId.toString()]
+//                                    ]
+//                            ]
+//
+//        ]
+//
+//        def request = createRequest(userToken).body(body)
+//
+//        def response = request.with().post("/run/$report1Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .assertThat().header("Content-Disposition", containsString("filename=\"" + URLEncodeUtils.encodeUtf8("Report for entity \"User\".docx") + "\""))
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .assertThat().header("Content-Disposition", containsString("inline"))
+//
+//        when:
+//
+//        body = ['attachment' : 'true',
+//                'parameters':
+//                            [
+//                                    [
+//                                            'name' : 'entities',
+//                                            'values': [userId.toString()]
+//                                    ]
+//                            ]
+//        ]
+//
+//        request = createRequest(userToken).body(body)
+//
+//        response = request.with().post("/run/$report1Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .assertThat().header("Content-Disposition", containsString("filename=\"" + URLEncodeUtils.encodeUtf8("Report for entity \"User\".docx") + "\""))
+//        response.then().statusCode(HttpStatus.SC_OK)
+//                .assertThat().header("Content-Disposition", containsString("attachment"))
+//    }
+//
+//    def "Run report without required params"() {
+//        when:
+//
+//        def body = ['attachment' : 'true',
+//                'parameters': []
+//        ]
+//
+//        def request = createRequest(userToken).body(body)
+//
+//        def response = request.with().post("/run/$report1Id")
+//
+//        then:
+//
+//        response.then().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+//                .assertThat().body("details", containsString("Required report parameter \"entities\" not found"))
+//    }
 
     def "Run report without user access rights"() {
         when:
