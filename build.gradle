@@ -37,6 +37,7 @@ def portalModule = project(":${modulePrefix}-portal")
 def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
 
 apply(plugin: 'cuba')
+apply(plugin: 'addon-gradle-plugin')
 
 cuba {
     artifact {
@@ -63,6 +64,7 @@ configure([globalModule, coreModule, webModule, portalModule]) {
     apply(plugin: 'groovy')
     apply(plugin: 'maven')
     apply(plugin: 'cuba')
+    apply(plugin: 'addon-gradle-plugin')
 
     dependencies {
         testCompile('org.jmockit:jmockit:1.39')
