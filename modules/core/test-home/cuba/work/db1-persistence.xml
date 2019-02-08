@@ -17,9 +17,9 @@
     <class>com.haulmont.cuba.core.entity.BaseIntIdentityIdEntity</class>
     <class>com.haulmont.cuba.core.entity.StandardEntity</class>
     <class>com.haulmont.cuba.core.entity.EmbeddableEntity</class>
-    <class>com.haulmont.addon.restaddondemo.core.entity.multidb.Db1Customer</class>
-    <class>com.haulmont.addon.restaddondemo.core.entity.multidb.Db1Order</class>
-    <class>com.haulmont.addon.restaddondemo.core.entity.multidb.Db1Foo</class>
+    <class>com.haulmont.rest.demo.core.entity.multidb.Db1Customer</class>
+    <class>com.haulmont.rest.demo.core.entity.multidb.Db1Order</class>
+    <class>com.haulmont.rest.demo.core.entity.multidb.Db1Foo</class>
     <exclude-unlisted-classes/>
     <properties>
       <property name="eclipselink.cache.coordination.propagate-asynchronously" value="false"/>

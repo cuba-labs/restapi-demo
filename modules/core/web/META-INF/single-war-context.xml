@@ -13,8 +13,8 @@
             maxIdle="2"
             maxWaitMillis="5000"
             driverClassName="org.postgresql.Driver"
-            username="cuba"
-            password="cuba"
+            username="root"
+            password="root"
             url="jdbc:postgresql://localhost/refapp_6"/>
 
     <Resource

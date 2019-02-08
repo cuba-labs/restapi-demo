@@ -40,7 +40,7 @@ apply(plugin: 'cuba')
 
 cuba {
     artifact {
-        group = 'com.haulmont.addon.restaddondemo'
+        group = 'com.haulmont.rest.demo'
         version = '0.1'
         isSnapshot = true
     }
@@ -151,16 +151,16 @@ configure(coreModule) {
         dbms = 'postgres'
         host = 'localhost'
         dbName = 'refapp_6'
-        dbUser = 'cuba'
-        dbPassword = 'cuba'
+        dbUser = 'root'
+        dbPassword = 'root'
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
         dbms = 'postgres'
         host = 'localhost'
         dbName = 'refapp_6'
-        dbUser = 'cuba'
-        dbPassword = 'cuba'
+        dbUser = 'root'
+        dbPassword = 'root'
     }
 }
 
@@ -191,7 +191,7 @@ configure(webModule) {
 
     task deployConf(type: Copy) {
         from file('src')
-        include "com/haulmont/addon/restaddondemo/**"
+        include "com/haulmont/rest/demo/**"
         into "$cuba.tomcat.dir/conf/${modulePrefix}"
     }
 
