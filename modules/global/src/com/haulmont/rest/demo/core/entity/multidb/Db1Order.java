@@ -7,8 +7,6 @@ package com.haulmont.rest.demo.core.entity.multidb;
 
 import com.haulmont.chile.core.annotations.MetaProperty;
 import com.haulmont.cuba.core.entity.BaseDbGeneratedIdEntity;
-import com.haulmont.rest.demo.core.entity.compkey.CompKey;
-import com.haulmont.rest.demo.core.entity.compkey.CompKeyCustomer;
 import com.haulmont.rest.demo.core.entity.identity.IdentityCustomer;
 import com.haulmont.rest.demo.core.entity.identity.IdentityOrder;
 
@@ -53,17 +51,6 @@ public class Db1Order extends BaseDbGeneratedIdEntity<Long> {
 
     @Column(name = "IK_ORDER_ID")
     private Long ikOrderId;
-
-    @Transient
-    @MetaProperty(related = "ckCustomerId")
-    private CompKeyCustomer ckCustomer;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "tenantId", column = @Column(name = "CK_CUSTOMER_TENANT_ID")),
-            @AttributeOverride(name = "entityId", column = @Column(name = "CK_CUSTOMER_ENTITY_ID"))
-    })
-    private CompKey ckCustomerId;
 
     @Override
     protected void setDbGeneratedId(Long dbId) {
@@ -139,19 +126,4 @@ public class Db1Order extends BaseDbGeneratedIdEntity<Long> {
         this.ikOrderId = ikOrderId;
     }
 
-    public CompKeyCustomer getCkCustomer() {
-        return ckCustomer;
-    }
-
-    public void setCkCustomer(CompKeyCustomer ckCustomer) {
-        this.ckCustomer = ckCustomer;
-    }
-
-    public CompKey getCkCustomerId() {
-        return ckCustomerId;
-    }
-
-    public void setCkCustomerId(CompKey ckCustomerId) {
-        this.ckCustomerId = ckCustomerId;
-    }
 }

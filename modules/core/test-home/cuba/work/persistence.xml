@@ -101,12 +101,6 @@
     <class>com.haulmont.rest.demo.core.entity.identity.IdentityOrder</class>
     <class>com.haulmont.rest.demo.core.entity.identity.IdentityOrderLine</class>
     <class>com.haulmont.rest.demo.core.entity.identity.IdentityOrderLineTag</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKey</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKeyBaseEntity</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKeyCustomer</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKeyOrder</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKeyOrderLine</class>
-    <class>com.haulmont.rest.demo.core.entity.compkey.CompKeyOrderLineTag</class>
     <exclude-unlisted-classes/>
     <properties>
       <property name="eclipselink.cache.coordination.propagate-asynchronously" value="false"/>
