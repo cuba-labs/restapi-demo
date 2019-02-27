@@ -1,23 +1,12 @@
 
 buildscript {
-    ext.cubaVersion = '7.1-SNAPSHOT'
+    ext.cubaVersion = '7.0.1'
     repositories {
         mavenLocal()
-        if (System.getenv('HAULMONT_REPOSITORY_URL')) {
-            maven {
-                credentials {
-                    username System.getenv('HAULMONT_REPOSITORY_USER')
-                    password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
-                }
-                url System.getenv('HAULMONT_REPOSITORY_URL')
-            }
-        } else {
             jcenter()
             maven {
                 url "https://dl.bintray.com/cuba-platform/main" 
             }
-        }
-        
     }
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
