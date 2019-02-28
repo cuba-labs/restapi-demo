@@ -5,19 +5,9 @@
 buildscript {
     repositories {
         mavenLocal()
-        if (System.getenv('HAULMONT_REPOSITORY_URL')) {
-            maven {
-                credentials {
-                    username System.getenv('HAULMONT_REPOSITORY_USER')
-                    password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
-                }
-                url System.getenv('HAULMONT_REPOSITORY_URL')
-            }
-        } else {
-            jcenter()
-            maven {
-                url "https://dl.bintray.com/cuba-platform/main"
-            }
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/cuba-platform/main"
         }
     }
     dependencies {
@@ -44,7 +34,7 @@ def coreJarNames = ['cuba-global', 'cuba-core',
                     'app-global', 'app-core']
 
 configure(coreModule) {
-    
+
     assembleDbScripts { moduleAlias = '30-refapp' }
 
     task createTestDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for tests', type: CubaDbCreation) {
@@ -67,7 +57,7 @@ configure(coreModule) {
         dbUser = 'root'
         dbPassword = 'root'
     }
-    
+
 
     // HSQLDB stuff
 
@@ -102,10 +92,8 @@ configure(coreModule) {
         dbUser = 'sa'
         dbPassword = ''
     }
-    
+
 }
-
-
 
 
 configure(portalModule) {
@@ -185,7 +173,7 @@ restv2.rest.ldap.userLoginField = cn
 }
 
 task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble],
-                 description: 'Prepare server for tests') {
+        description: 'Prepare server for tests') {
     doLast {
         // Setup
         setupTomcat.execute()

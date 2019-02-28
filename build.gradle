@@ -164,8 +164,8 @@ configure(webModule) {
         compileOnly(servletApi)
         compile(globalModule)
 
-        testCompile('com.haulmont.masquerade:masquerade-connector:1.0-SNAPSHOT')
-        testCompile('com.haulmont.masquerade:masquerade-web:1.0-SNAPSHOT')
+        testCompile('com.haulmont.masquerade:masquerade-connector:1.0.7')
+        testCompile('com.haulmont.masquerade:masquerade-web:1.0.7')
         
         testCompile('junit:junit:4.12')
     }
@@ -213,7 +213,7 @@ configure(portalModule) {
         compileOnly(servletApi)
         compile(globalModule)
 
-        testCompile('com.haulmont.masquerade:masquerade-connector:1.0-SNAPSHOT')
+        testCompile('com.haulmont.masquerade:masquerade-connector:1.0.7')
         testCompile('com.jayway.jsonpath:json-path:2.4.0')
         testCompile('org.apache.httpcomponents:fluent-hc:4.5.2')
         testCompile('org.apache.httpcomponents:httpmime:4.5.2')
