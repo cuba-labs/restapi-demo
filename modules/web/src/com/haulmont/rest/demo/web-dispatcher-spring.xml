@@ -13,6 +13,6 @@
     <context:annotation-config/>
 
     <context:component-scan base-package="com.haulmont.rest.demo.web.controllers"/>
-    <context:component-scan base-package="com.haulmont.addon.restv2.restapi"/>
+    <context:component-scan base-package="com.haulmont.addon.restapi.rest"/>
 
 </beans>

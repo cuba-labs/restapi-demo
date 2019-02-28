@@ -92,6 +92,7 @@
     <class>com.haulmont.rest.demo.core.entity.Place</class>
     <class>com.haulmont.rest.demo.core.entity.Seller</class>
     <class>com.haulmont.rest.demo.core.entity.Currency</class>
+    <class>com.haulmont.rest.demo.core.entity.PricingRegion</class>
     <class>com.haulmont.rest.demo.core.entity.AllocatedCar</class>
     <class>com.haulmont.rest.demo.core.entity.Card</class>
     <class>com.haulmont.rest.demo.core.entity.SamplePlatformEntity</class>

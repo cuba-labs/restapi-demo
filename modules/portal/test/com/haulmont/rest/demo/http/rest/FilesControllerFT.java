@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  */
 public class FilesControllerFT extends AbstractRestControllerFT {
 
-    public String URI_BASE = "http://localhost:8080/app/restv2/v2";
+    public String URI_BASE = "http://localhost:8080/app/restapi/v2";
 
     @Test
     public void uploadFile() throws Exception {

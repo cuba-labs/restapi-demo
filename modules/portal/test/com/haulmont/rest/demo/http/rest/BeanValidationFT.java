@@ -65,7 +65,7 @@ public class BeanValidationFT extends AbstractRestControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restv2/v2/entities/ref$Currency"));
+            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$Currency"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
 
             dirtyData.addCurrencyId(idString);
@@ -151,7 +151,7 @@ public class BeanValidationFT extends AbstractRestControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restv2/v2/entities/ref$Currency"));
+            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$Currency"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
 
             dirtyData.addCurrencyId(idString);

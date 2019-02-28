@@ -13,7 +13,7 @@ import static com.haulmont.masquerade.Connectors.RestApiHost
 import static com.haulmont.masquerade.Connectors.restApi
 
 class NotFoundUrlFT extends Specification {
-    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/restv2/v2/'
+    static final PORTAL_REST_API_BASE_URL = 'http://localhost:8080/app-portal/restapi/v2/'
 
     def "REST-API returns 404 for incorrect URL"() {
         def host = new RestApiHost("admin", "admin", PORTAL_REST_API_BASE_URL)
