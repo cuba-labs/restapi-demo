@@ -16,15 +16,15 @@ import static io.restassured.RestAssured.given;
 public class RestSpecsUtils {
 
     static {
-        RestAssured.basePath = "/app/restapi/v2";
+        RestAssured.basePath = "/app/rest/v2";
     }
 
     public static void setReportsBasePath() {
-        RestAssured.basePath = "/app/restapi/reports/v1";
+        RestAssured.basePath = "/app/rest/reports/v1";
     }
 
     public static void clearBasePath() {
-        RestAssured.basePath = "/app/restapi/v2";
+        RestAssured.basePath = "/app/rest/v2";
     }
 
     public static RequestSpecification createRequest(String authToken) {

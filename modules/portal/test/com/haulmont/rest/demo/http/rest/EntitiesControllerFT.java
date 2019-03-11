@@ -539,7 +539,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref_Car"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             carId = UUID.fromString(idString);
 
@@ -603,7 +603,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref_Car"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             carId = UUID.fromString(idString);
 
@@ -639,7 +639,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$Currency"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref$Currency"));
             currencyId = location.substring(location.lastIndexOf("/") + 1);
 
             ReadContext ctx = parseResponse(response);
@@ -701,7 +701,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref_Car"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             UUID carId = UUID.fromString(idString);
             dirtyData.addCarId(carId);
@@ -780,7 +780,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$Mem1Customer"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref$Mem1Customer"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             customerId = UUID.fromString(idString);
 
@@ -835,7 +835,7 @@ public class EntitiesControllerFT {
     @Test
     public void updateCarWithVersion() throws Exception {
         Connectors.jmx(WebConfigStorageJmxService.class)
-                .setAppProperty("restapi.rest.optimisticLockingEnabled", "true");
+                .setAppProperty("cuba.rest.optimisticLockingEnabled", "true");
         try {
             Map<String, String> replacements = new HashMap<>();
             replacements.put("$CAR_ID$", carUuidString);
@@ -874,7 +874,7 @@ public class EntitiesControllerFT {
             }
         } finally {
             Connectors.jmx(WebConfigStorageJmxService.class)
-                    .setAppProperty("restapi.rest.optimisticLockingEnabled", "false");
+                    .setAppProperty("cuba.rest.optimisticLockingEnabled", "false");
         }
     }
 
@@ -1027,7 +1027,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref_Car"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             carId = UUID.fromString(idString);
 
@@ -1398,7 +1398,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$OldCar"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref$OldCar"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             carId = UUID.fromString(idString);
 
@@ -1536,7 +1536,7 @@ public class EntitiesControllerFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$OldRepair"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref$OldRepair"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             repairId = UUID.fromString(idString);
 

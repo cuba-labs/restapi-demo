@@ -106,7 +106,7 @@ public class EntitiesControllerAttributeAccessFT {
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
             String location = locationHeaders[0].getValue();
-            assertTrue(location.startsWith("http://localhost:8080/app/restapi/v2/entities/ref$Driver"));
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref$Driver"));
             String idString = location.substring(location.lastIndexOf("/") + 1);
             driverId = UUID.fromString(idString);
 

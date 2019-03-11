@@ -15,7 +15,7 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.statusCode;
 import static org.junit.Assert.assertEquals;
 
 public class NotAuthenticatedAccessFT {
-    protected static final String URI_BASE = "http://localhost:8080/app/restapi/v2";
+    protected static final String URI_BASE = "http://localhost:8080/app/rest/v2";
 
     @Test
     public void requestEntitiesController() throws Exception {

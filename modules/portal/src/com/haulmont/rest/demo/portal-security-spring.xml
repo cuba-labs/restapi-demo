@@ -15,7 +15,7 @@
     </beans:bean>
 
     <!-- REST-API has separate spring-security configuration -->
-    <http pattern="/restapi/**" security="none"/>
+    <http pattern="/rest/**" security="none"/>
     <http pattern="/api/**" security="none"/>
     <http pattern="/resources/**" security="none"/>
 

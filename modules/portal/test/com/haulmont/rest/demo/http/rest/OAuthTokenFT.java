@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class OAuthTokenFT {
 
-    protected static final String URI_BASE = "http://localhost:8080/app/restapi/v2";
+    protected static final String URI_BASE = "http://localhost:8080/app/rest/v2";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
