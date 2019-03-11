@@ -1,0 +1,1 @@
+drop table if exists REF_CK_ORDER__U40579 cascade ;

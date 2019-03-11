@@ -162,12 +162,12 @@ refapp.core.embeddedLdap.startTcpServer = true
 '''
         project.file("${cuba.tomcat.dir}/conf/app-portal/").mkdirs()
         project.file("${cuba.tomcat.dir}/conf/app-portal/local.app.properties").text = '''
-restapi.rest.ldap.enabled = true
-restapi.rest.ldap.urls = ldap://localhost:10389
-restapi.rest.ldap.base = dc=example,dc=com
-restapi.rest.ldap.user = cn=refapp,dc=example,dc=com
-restapi.rest.ldap.password = refapp
-restapi.rest.ldap.userLoginField = cn
+cuba.rest.ldap.enabled = true
+cuba.rest.ldap.urls = ldap://localhost:10389
+cuba.rest.ldap.base = dc=example,dc=com
+cuba.rest.ldap.user = cn=refapp,dc=example,dc=com
+cuba.rest.ldap.password = refapp
+cuba.rest.ldap.userLoginField = cn
 '''
     }
 }
