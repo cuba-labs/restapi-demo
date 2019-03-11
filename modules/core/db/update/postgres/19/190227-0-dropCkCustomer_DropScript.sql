@@ -1,1 +1,0 @@
-drop table if exists REF_CK_CUSTOMER__U64182 cascade ;
