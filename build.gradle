@@ -1,20 +1,28 @@
 
 buildscript {
-    ext.cubaVersion = '7.0.1'
+    ext.cubaVersion = '7.1-SNAPSHOT'
     repositories {
         mavenLocal()
-            jcenter()
-            maven {
-                url "https://dl.bintray.com/cuba-platform/main" 
+        jcenter()
+
+        /*
+         * maven { url "https://dl.bintray.com/cuba-platform/main" }
+         *
+         * TODO: temprorary - use Bintray later
+         */
+        maven {
+            url 'https://repo.cuba-platform.com/content/groups/work'
+            credentials {
+                username 'cuba'
+                password 'cuba123'
             }
+        }
     }
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
         classpath "com.haulmont.gradle:addon-gradle-plugin:1.0.3"
     }
 }
-
-
 
 def modulePrefix = 'app'
 
