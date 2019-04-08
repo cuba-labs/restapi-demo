@@ -113,6 +113,12 @@ configure(portalModule) {
         includes = ['**/*FT.class']
         workingDir = "$projectDir/../../"
     }
+
+    task funcWarTest(dependsOn: ':prepareWarTest', description: 'Run functional tests', type: Test) {
+        scanForTestClasses = false
+        includes = ['**/*FT.class']
+        workingDir = "$projectDir/../../"
+    }
 }
 
 task clearConf(description: 'Clears conf directory') {
@@ -198,6 +204,38 @@ task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble
         portalModule.deploy.execute()
         // Create DB
         coreModule.createDb.execute()
+        // Start server
+        start.execute()
+
+        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            http(url: "http://localhost:8080/app")
+        }
+        // Delete out directory
+        File dir = new File("$projectDir/tests/ui/out")
+        if (dir.exists()) {
+            project.delete(dir)
+        }
+    }
+}
+
+task prepareWarTest(dependsOn: dropTomcat, description: 'Prepare server for tests') {
+    doLast {
+        // Setup
+        setupTomcat.execute()
+
+        // Test configuration
+        enableTestProperties.execute()
+        enableRemoteJmx.execute()
+
+        //Build
+        buildWar.execute()
+
+        // Deploy
+        copyWarToTomcat.execute()
+
+        // Create DB
+        coreModule.createDb.execute()
+        
         // Start server
         start.execute()
 
