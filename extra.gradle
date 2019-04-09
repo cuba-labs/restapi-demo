@@ -218,7 +218,7 @@ task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble
     }
 }
 
-task prepareWarTest(dependsOn: dropTomcat, description: 'Prepare server for tests') {
+task prepareWarTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble], description: 'Prepare server for tests') {
     doLast {
         // Setup
         setupTomcat.execute()
@@ -232,9 +232,6 @@ task prepareWarTest(dependsOn: dropTomcat, description: 'Prepare server for test
 
         // Deploy
         copyWarToTomcat.execute()
-
-        // Create DB
-        coreModule.createDb.execute()
         
         // Start server
         start.execute()
