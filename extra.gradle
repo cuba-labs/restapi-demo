@@ -105,7 +105,6 @@ configure(coreModule) {
 
 }
 
-
 configure(portalModule) {
 
     task funcTest(dependsOn: ':prepareTest', description: 'Run functional tests', type: Test) {
@@ -114,7 +113,7 @@ configure(portalModule) {
         workingDir = "$projectDir/../../"
     }
 
-    task funcWarTest(dependsOn: ':prepareWarTest', description: 'Run functional tests', type: Test) {
+    task startTestBuild(dependsOn: ':prepareBuildTest', description: 'Run functional tests', type: Test) {
         scanForTestClasses = false
         includes = ['**/*FT.class']
         workingDir = "$projectDir/../../"
@@ -218,21 +217,12 @@ task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble
     }
 }
 
-task prepareWarTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble], description: 'Prepare server for tests') {
+task prepareBuildTest(description: 'Prepare server for tests') {
     doLast {
-        // Setup
-        setupTomcat.execute()
-
         // Test configuration
         enableTestProperties.execute()
         enableRemoteJmx.execute()
 
-        //Build
-        buildWar.execute()
-
-        // Deploy
-        copyWarToTomcat.execute()
-        
         // Start server
         start.execute()
 
@@ -315,8 +305,9 @@ task buildSingleWar(type: CubaWarBuilding) {
 }
 
 task deploySingleWar(dependsOn: buildSingleWar, type: Copy) {
-    from file("$buildDir/distributions/war/app.war")
-    into file('../tomcat/webapps/')
+    from "${project.buildDir}/distributions/war"
+    include "*.war"
+    into "${cuba.tomcat.dir}/webapps"
 }
 
 task buildUberJar(type: CubaUberJarBuilding) {
@@ -333,7 +324,7 @@ task buildSingleUberJar(type: CubaUberJarBuilding) {
     logbackConfigurationFile = "test-deployment/logback.xml"
 }
 
-task copyWarToTomcat(type: Copy) {
+task copyWarToTomcat(dependsOn: buildWar, type: Copy) {
     from "${project.buildDir}/distributions/war"
     include "*.war"
     into "${cuba.tomcat.dir}/webapps"
