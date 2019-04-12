@@ -301,7 +301,7 @@ task buildSingleUberJar(type: CubaUberJarBuilding) {
     logbackConfigurationFile = "test-deployment/logback.xml"
 }
 
-task copyWarToTomcat(dependsOn: buildWar, type: Copy) {
+task copyWarToTomcat(type: Copy) {
     from "${project.buildDir}/distributions/war"
     include "*.war"
     into "${cuba.tomcat.dir}/webapps"
