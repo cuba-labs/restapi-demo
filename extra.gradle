@@ -54,7 +54,7 @@ configure(coreModule) {
         dbPassword = 'root'
     }
 
-    task createDemoDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for demo', type: CubaDbCreation) {
+    task createDemoDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for com', type: CubaDbCreation) {
         dbms = 'postgres'
         dbName = ('refapp_demo' + (demoToken != null ? '_' + demoToken : ''))
         dbUser = 'root'
@@ -113,10 +113,13 @@ configure(portalModule) {
         workingDir = "$projectDir/../../"
     }
 
-    task startTestBuild(dependsOn: ':prepareBuildTest', description: 'Run functional tests', type: Test) {
-        scanForTestClasses = false
-        includes = ['**/*FT.class']
-        workingDir = "$projectDir/../../"
+}
+
+
+configure(webModule) {
+    task testStart(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/rest/demo/DeploymentTest.class")
+        systemProperties = System.getProperties()
     }
 }
 
@@ -217,26 +220,6 @@ task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble
     }
 }
 
-task prepareBuildTest(description: 'Prepare server for tests') {
-    doLast {
-        // Test configuration
-        enableTestProperties.execute()
-        enableRemoteJmx.execute()
-
-        // Start server
-        start.execute()
-
-        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
-            http(url: "http://localhost:8080/app")
-        }
-        // Delete out directory
-        File dir = new File("$projectDir/tests/ui/out")
-        if (dir.exists()) {
-            project.delete(dir)
-        }
-    }
-}
-
 /* ============= Cluster testing =============== */
 
 def tomcat1Dir = cuba.tomcat.dir + '1'
@@ -302,12 +285,6 @@ task buildSingleWar(type: CubaWarBuilding) {
     coreContextXmlPath = 'modules/core/web/META-INF/single-war-context.xml'
     includeJdbcDriver = true
     includeContextXml = true
-}
-
-task deploySingleWar(dependsOn: buildSingleWar, type: Copy) {
-    from "${project.buildDir}/distributions/war"
-    include "*.war"
-    into "${cuba.tomcat.dir}/webapps"
 }
 
 task buildUberJar(type: CubaUberJarBuilding) {
