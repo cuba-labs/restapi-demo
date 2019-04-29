@@ -3,33 +3,33 @@ package com.haulmont.rest.demo;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.http.MediaType;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class RestUtils {
 
-    protected static final String URI_BASE = "http://localhost:8080/app/rest/v2";
+    private static final String CLIENT_ID = "client";
+    private static final String CLIENT_SECRET = "secret";
 
-    protected static final String CLIENT_ID = "client";
-    protected static final String CLIENT_SECRET = "secret";
-
-    public static CloseableHttpResponse sendGet(String url, String token, @Nullable Map<String, String> params) throws Exception {
-        URIBuilder uriBuilder = new URIBuilder(URI_BASE + url);
+    private static CloseableHttpResponse sendGet(String url, String token, @Nullable Map<String, String> params) throws Exception {
+        URIBuilder uriBuilder = new URIBuilder(url);
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 uriBuilder.addParameter(entry.getKey(), entry.getValue());
@@ -42,18 +42,22 @@ public class RestUtils {
         return httpClient.execute(httpGet);
     }
 
-    public static int statusCode(CloseableHttpResponse response) {
+    private static String responseContentType(CloseableHttpResponse response) {
+        return response.getEntity().getContentType().getValue();
+    }
+
+    private static int statusCode(CloseableHttpResponse response) {
         return response.getStatusLine().getStatusCode();
     }
 
-    public static ReadContext parseResponse(CloseableHttpResponse response) throws IOException {
+    private static ReadContext parseResponse(CloseableHttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
         String s = EntityUtils.toString(entity);
         return JsonPath.parse(s);
     }
 
-    public String getAuthToken() throws Exception {
-        String uri = URI_BASE + "/oauth/token";
+    public String getAuthToken(String urlBase) throws Exception {
+        String uri = urlBase + "/oauth/token";
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         String encoding = Base64.getEncoder().encodeToString((CLIENT_ID + ":" + CLIENT_SECRET).getBytes());
@@ -71,6 +75,36 @@ public class RestUtils {
         try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
             ReadContext ctx = parseResponse(response);
             return ctx.read("$.access_token");
+        }
+    }
+
+    public void loadSomeList(String url, String oauthToken) throws Exception {
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals(2, (int) ctx.read("$.length()", Integer.class));
+        }
+    }
+
+    public void executeQuery(String url, String oauthToken) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            assertEquals(MediaType.APPLICATION_JSON_UTF8_VALUE, responseContentType(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals(1, ctx.<Collection>read("$").size());
+            assertEquals("admin", ctx.read("$.[0].login"));
+        }
+    }
+
+    public void executeService(String url, String oauthToken) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("number1", "2");
+        params.put("number2", "3");
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
+            assertEquals("text/plain;charset=UTF-8", responseContentType(response));
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            assertEquals("5", EntityUtils.toString(response.getEntity()));
         }
     }
 
