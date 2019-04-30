@@ -5,7 +5,6 @@
 
 package com.haulmont.rest.demo.http.rest;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.masquerade.Connectors;
 import com.haulmont.rest.demo.http.api.DataSet;
 import com.haulmont.rest.demo.http.rest.jmx.CoreCachingFacadeJmxService;
@@ -19,8 +18,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,13 +28,11 @@ import static org.junit.Assert.*;
 
 public class EntitiesControllerFT {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
     private static final String userLogin = "admin";
     private static final String userPassword = "admin";
-
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
     private Connection conn;
     private DataSet dirtyData = new DataSet();
     private String oauthToken;
@@ -63,8 +60,8 @@ public class EntitiesControllerFT {
     @Before
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         prepareDb();
         Connectors.jmx(CoreCachingFacadeJmxService.class)
                 .clearDynamicAttributesCache();
@@ -97,12 +94,14 @@ public class EntitiesControllerFT {
             try {
                 ctx.read("&.colour");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
 
             try {
                 ctx.read("&.model");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -489,8 +488,8 @@ public class EntitiesControllerFT {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
             assertEquals(2, ctx.<Collection>read("$").size());
-            assertTrue(((String)ctx.read("$[0].vin")).startsWith("VW"));
-            assertTrue(((String)ctx.read("$[1].vin")).startsWith("VW"));
+            assertTrue(((String) ctx.read("$[0].vin")).startsWith("VW"));
+            assertTrue(((String) ctx.read("$[1].vin")).startsWith("VW"));
         }
     }
 
@@ -503,7 +502,7 @@ public class EntitiesControllerFT {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
             assertEquals(2, ctx.<Collection>read("$").size());
-            assertTrue(((String)ctx.read("$[0].vin")).startsWith("VW"));
+            assertTrue(((String) ctx.read("$[0].vin")).startsWith("VW"));
             assertEquals(colourUuidString, ctx.read("$.[0]colour.id"));
         }
     }
@@ -520,7 +519,7 @@ public class EntitiesControllerFT {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
             assertEquals(2, ctx.<Collection>read("$").size());
-            assertTrue(((String)ctx.read("$[0].vin")).startsWith("VW"));
+            assertTrue(((String) ctx.read("$[0].vin")).startsWith("VW"));
             assertEquals(colourUuidString, ctx.read("$.[0]colour.id"));
         }
     }
@@ -554,7 +553,7 @@ public class EntitiesControllerFT {
             //to delete the created objects in the @After method
             dirtyData.addCarId(carId);
             try (PreparedStatement stmt = conn.prepareStatement("select ID from REF_REPAIR where CAR_ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(carId));
+                stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     dirtyData.addRepairId((UUID) rs.getObject("ID"));
@@ -563,7 +562,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -573,7 +572,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION, REPAIR_DATE from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description1 = rs.getString("DESCRIPTION");
@@ -614,7 +613,7 @@ public class EntitiesControllerFT {
             //to delete the created objects in the @After method
             dirtyData.addCarId(carId);
             try (PreparedStatement stmt = conn.prepareStatement("select ID, STRING_VALUE from SYS_ATTR_VALUE where ENTITY_ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(carId));
+                stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     UUID categoryAttrValueId = (UUID) rs.getObject("ID");
@@ -690,7 +689,7 @@ public class EntitiesControllerFT {
 
     @Test
     public void createNewEntityWithDeletedReference() throws Exception {
-        executePrepared("update REF_MODEL set DELETE_TS = CURRENT_TIMESTAMP where id = ?", new PostgresUUID(UUID.fromString(model3UuidString)));
+        executePrepared("update REF_MODEL set DELETE_TS = CURRENT_TIMESTAMP where id = ?", UUID.fromString(model3UuidString));
         Map<String, String> replacements = new HashMap<>();
         replacements.put("$MODEL_ID$", model3UuidString);
         String json = getFileContent("carWithModel.json", replacements);
@@ -726,7 +725,7 @@ public class EntitiesControllerFT {
             dirtyData.addDriverId(driverId);
 
             try (PreparedStatement stmt = conn.prepareStatement("select NAME, STATUS from REF_DRIVER where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(driverId));
+                stmt.setObject(1, driverId);
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 String name = rs.getString("NAME");
@@ -740,7 +739,7 @@ public class EntitiesControllerFT {
     @Test
     public void createEntityWithTransientProperty() throws Exception {
         Map<String, String> replacements = new HashMap<>();
-        replacements.put("$DEBTOR_ID$",debtorUuidString);
+        replacements.put("$DEBTOR_ID$", debtorUuidString);
 
         String json = getFileContent("createEntityWithTransientProperty.json", replacements);
         String url = "/entities/debt$Case";
@@ -758,7 +757,7 @@ public class EntitiesControllerFT {
             dirtyData.addCaseId(caseUUID);
 
             try (PreparedStatement stmt = conn.prepareStatement("select TEST1 from DEBT_CASE where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(caseUUID));
+                stmt.setObject(1, caseUUID);
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 String test1 = rs.getString("TEST1");
@@ -822,7 +821,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -864,7 +863,7 @@ public class EntitiesControllerFT {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID from REF_CAR where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+                stmt.setObject(1, UUID.fromString(carUuidString));
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 String vin = rs.getString("VIN");
@@ -894,7 +893,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select STRING_VALUE from SYS_ATTR_VALUE where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(numberOfSeatsCategoryAttrValueId));
+            stmt.setObject(1, numberOfSeatsCategoryAttrValueId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String value = rs.getString("STRING_VALUE");
@@ -917,7 +916,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select STRING_VALUE from SYS_ATTR_VALUE where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(numberOfSeatsCategoryAttrValueId));
+            stmt.setObject(1, numberOfSeatsCategoryAttrValueId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String value = rs.getString("STRING_VALUE");
@@ -941,7 +940,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select ID, STRING_VALUE from SYS_ATTR_VALUE where ENTITY_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(secondCarUuidString)));
+            stmt.setObject(1, UUID.fromString(secondCarUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             UUID attrValueId = (UUID) rs.getObject("ID");
@@ -963,7 +962,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID, COLOUR_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -982,7 +981,7 @@ public class EntitiesControllerFT {
         String json = getFileContent("updateCarWithNullReferenceOneToOneComposition.json", replacements);
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, CAR_DOCUMENTATION_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             Object carDocumentationId = rs.getObject("CAR_DOCUMENTATION_ID");
@@ -995,7 +994,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, CAR_DOCUMENTATION_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -1005,7 +1004,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DELETE_TS from REF_CAR_DOCUMENTATION where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carDocumentationUuidString)));
+            stmt.setObject(1, UUID.fromString(carDocumentationUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             Date deleteTs = rs.getDate("DELETE_TS");
@@ -1042,7 +1041,7 @@ public class EntitiesControllerFT {
             //to delete the created objects in the @After method
             dirtyData.addCarId(carId);
             try (PreparedStatement stmt = conn.prepareStatement("select ID from REF_REPAIR where CAR_ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(carId));
+                stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     dirtyData.addRepairId((UUID) rs.getObject("ID"));
@@ -1050,7 +1049,7 @@ public class EntitiesControllerFT {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement("select t.ID from REF_CAR_TOKEN t join REF_REPAIR r on r.id = t.repair_id where r.CAR_ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(carId));
+                stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     dirtyData.addCarTokenId((UUID) rs.getObject("ID"));
@@ -1061,7 +1060,7 @@ public class EntitiesControllerFT {
         UUID repair1Id;
         UUID repair2Id;
         try (PreparedStatement stmt = conn.prepareStatement("select ID, DESCRIPTION from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description1 = rs.getString("DESCRIPTION");
@@ -1074,7 +1073,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select TOKEN from REF_CAR_TOKEN where REPAIR_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(repair2Id));
+            stmt.setObject(1, repair2Id);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String token = rs.getString("TOKEN");
@@ -1100,7 +1099,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION from REF_REPAIR where CAR_ID = ? and DELETE_TS is null")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description = rs.getString("DESCRIPTION");
@@ -1152,7 +1151,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select COUNTRY, CITY from REF_DRIVER where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(driverUuidString)));
+            stmt.setObject(1, UUID.fromString(driverUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String country = rs.getString("COUNTRY");
@@ -1181,7 +1180,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_PLANT where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(newPlantId)));
+            stmt.setObject(1, UUID.fromString(newPlantId));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String plantNameFromDb = rs.getString("NAME");
@@ -1190,7 +1189,7 @@ public class EntitiesControllerFT {
 
         //model2 must be removed from the models collection
         try (PreparedStatement stmt = conn.prepareStatement("select MODEL_ID from REF_PLANT_MODEL_LINK where PLANT_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(newPlantId)));
+            stmt.setObject(1, UUID.fromString(newPlantId));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String modelId = rs.getString("MODEL_ID");
@@ -1224,7 +1223,7 @@ public class EntitiesControllerFT {
 
         //model2 must be removed from the models collection
         try (PreparedStatement stmt = conn.prepareStatement("select MODEL_ID from REF_PLANT_MODEL_LINK where PLANT_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(plantUuidString)));
+            stmt.setObject(1, UUID.fromString(plantUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String modelId = rs.getString("MODEL_ID");
@@ -1234,7 +1233,7 @@ public class EntitiesControllerFT {
 
         //but model2 must remain in the database
         try (PreparedStatement stmt = conn.prepareStatement("select DELETE_TS from REF_MODEL where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(model2UuidString)));
+            stmt.setObject(1, UUID.fromString(model2UuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             Date deleteTs = rs.getDate("DELETE_TS");
@@ -1298,7 +1297,6 @@ public class EntitiesControllerFT {
     }
 
 
-
     @Test
     public void deleteCar() throws Exception {
         String url = "/entities/ref_Car/" + carUuidString;
@@ -1307,7 +1305,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DELETE_TS from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             assertNotNull(rs.getTimestamp("DELETE_TS"));
@@ -1342,13 +1340,15 @@ public class EntitiesControllerFT {
             try {
                 ctx.read("$.vin");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
 
             //colour must be removed
             try {
                 ctx.read("$.colour");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -1414,7 +1414,7 @@ public class EntitiesControllerFT {
             //to delete the created objects in the @After method
             dirtyData.addCarId(carId);
             try (PreparedStatement stmt = conn.prepareStatement("select ID from REF_REPAIR where CAR_ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(carId));
+                stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     dirtyData.addRepairId((UUID) rs.getObject("ID"));
@@ -1423,7 +1423,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -1433,7 +1433,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION, REPAIR_DATE from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description1 = rs.getString("DESCRIPTION");
@@ -1471,7 +1471,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select VIN, MODEL_ID from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String vin = rs.getString("VIN");
@@ -1492,7 +1492,7 @@ public class EntitiesControllerFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DELETE_TS from REF_CAR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(carUuidString)));
+            stmt.setObject(1, UUID.fromString(carUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             assertNotNull(rs.getTimestamp("DELETE_TS"));
@@ -1516,7 +1516,8 @@ public class EntitiesControllerFT {
             try {
                 ctx.read("$.name");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -1550,7 +1551,7 @@ public class EntitiesControllerFT {
         dirtyData.addRepairId(repairId);
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION from REF_REPAIR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(repairId));
+            stmt.setObject(1, repairId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description = rs.getString("DESCRIPTION");
@@ -1571,28 +1572,28 @@ public class EntitiesControllerFT {
         UUID colourId = dirtyData.createColourUuid();
         colourUuidString = colourId.toString();
         executePrepared("insert into ref_colour(id, name, version) values (?, ?, 1)",
-                new PostgresUUID(colourId),
+                colourId,
                 "Colour 1");
 
         UUID modelId = dirtyData.createModelUuid();
         modelUuidString = modelId.toString();
         executePrepared("insert into ref_model(id, name, number_of_seats, DTYPE, version) values (?, ?, ?, ?, 1)",
-                new PostgresUUID(modelId), modelName, modelNumberOfSeats, "ref$ExtModel");
+                modelId, modelName, modelNumberOfSeats, "ref$ExtModel");
 
         UUID model2Id = dirtyData.createModelUuid();
         model2UuidString = model2Id.toString();
         executePrepared("insert into ref_model(id, name, number_of_seats, DTYPE, version) values (?, ?, ?, ?, 1)",
-                new PostgresUUID(model2Id), model2Name, modelNumberOfSeats, "ref$ExtModel");
+                model2Id, model2Name, modelNumberOfSeats, "ref$ExtModel");
 
         UUID model3Id = dirtyData.createModelUuid();
         model3UuidString = model3Id.toString();
         executePrepared("insert into ref_model(id, name, number_of_seats, DTYPE, version) values (?, ?, ?, ?, 1)",
-                new PostgresUUID(model3Id), "model3", modelNumberOfSeats, "ref$ExtModel");
+                model3Id, "model3", modelNumberOfSeats, "ref$ExtModel");
 
         UUID carDocumentationUuid = dirtyData.createCarDocumentationUuid();
         carDocumentationUuidString = carDocumentationUuid.toString();
         executePrepared("insert into ref_car_documentation(id, version, title, create_ts) values(?, ?, ?, ?)",
-                new PostgresUUID(carDocumentationUuid),
+                carDocumentationUuid,
                 1L,
                 "Car Doc 1",
                 java.sql.Timestamp.valueOf("2016-06-17 10:53:01")
@@ -1601,49 +1602,49 @@ public class EntitiesControllerFT {
         UUID carUuid = dirtyData.createCarUuid();
         carUuidString = carUuid.toString();
         executePrepared("insert into ref_car(id, version, vin, colour_id, model_id, car_documentation_id, create_ts) values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(carUuid),
+                carUuid,
                 1L,
                 "VWV000",
-                new PostgresUUID(colourId),
-                new PostgresUUID(modelId),
-                new PostgresUUID(carDocumentationUuid),
+                colourId,
+                modelId,
+                carDocumentationUuid,
                 java.sql.Timestamp.valueOf("2016-06-17 10:53:01")
         );
 
         UUID secondCarUuid = dirtyData.createCarUuid();
         secondCarUuidString = secondCarUuid.toString();
         executePrepared("insert into ref_car(id, version, vin, colour_id) values(?, ?, ?, ?)",
-                new PostgresUUID(secondCarUuid),
+                secondCarUuid,
                 1L,
                 "VWV002",
-                new PostgresUUID(colourId)
+                colourId
         );
 
         UUID repairId = dirtyData.createRepairUuid();
         repairUuidString = repairId.toString();
         executePrepared("insert into ref_repair(id, car_id, repair_date, version) values (?, ?, ?, 1)",
-                new PostgresUUID(repairId),
-                new PostgresUUID(carUuid),
+                repairId,
+                carUuid,
                 java.sql.Date.valueOf("2012-01-13"));
 
         UUID repair2Id = dirtyData.createRepairUuid();
         repair2UuidString = repair2Id.toString();
         executePrepared("insert into ref_repair(id, car_id, repair_date, version) values (?, ?, ?, 1)",
-                new PostgresUUID(repair2Id),
-                new PostgresUUID(carUuid),
+                repair2Id,
+                carUuid,
                 java.sql.Date.valueOf("2012-01-14"));
 
         for (int i = 2; i < 6; i++) {
             UUID colourUuid = dirtyData.createColourUuid();
             executePrepared("insert into ref_colour(id, name, version) values (?, ?, 1)",
-                    new PostgresUUID(colourUuid),
+                    colourUuid,
                     "Colour " + i);
         }
 
         UUID driverId = dirtyData.createDriverUuid();
         driverUuidString = driverId.toString();
         executePrepared("insert into ref_driver(id, name, country, city, notes, dtype, version) values (?, ?, ?, ?, ?, ?, 1)",
-                new PostgresUUID(driverId),
+                driverId,
                 "John",
                 "Russia",
                 "Samara",
@@ -1654,25 +1655,25 @@ public class EntitiesControllerFT {
         UUID debtorId = dirtyData.createDebtorUuid();
         debtorUuidString = debtorId.toString();
         executePrepared("insert into debt_debtor(id, title, version) values (?, ?, 1)",
-                new PostgresUUID(debtorId),
+                debtorId,
                 "debtor1"
         );
 
         UUID plantId = dirtyData.createPlantUuid();
         plantUuidString = plantId.toString();
         executePrepared("insert into REF_PLANT(id, name, DTYPE, version) values (?, ?, 'ref$CustomExtPlant', 1)",
-                new PostgresUUID(plantId),
+                plantId,
                 "plant1"
         );
 
         executePrepared("insert into REF_PLANT_MODEL_LINK(plant_id, model_id) values (?, ?)",
-                new PostgresUUID(plantId),
-                new PostgresUUID(modelId)
+                plantId,
+                modelId
         );
 
         executePrepared("insert into REF_PLANT_MODEL_LINK(plant_id, model_id) values (?, ?)",
-                new PostgresUUID(plantId),
-                new PostgresUUID(model2Id)
+                plantId,
+                model2Id
         );
 
         executePrepared("insert into REF_IK_CUSTOMER(name) values (?)",
@@ -1682,7 +1683,7 @@ public class EntitiesControllerFT {
         UUID carCategoryId = dirtyData.createCategoryId();
 //        String debtorUuidString = carCategoryId.toString();
         executePrepared("insert into sys_category (id, name, entity_type, discriminator, version) values (?, ?, ?, 0, 1)",
-                new PostgresUUID(carCategoryId),
+                carCategoryId,
                 "carCategory",
                 "ref_Car"
         );
@@ -1690,20 +1691,20 @@ public class EntitiesControllerFT {
         UUID seatsNumberCategoryAttrId = dirtyData.createCategoryAttributeId();
         executePrepared("insert into sys_category_attr (id, name, code, category_entity_type, category_id, data_type, " +
                         "is_collection, version) values (?,?,?, ?, ?, ?,false, 1)",
-                new PostgresUUID(seatsNumberCategoryAttrId),
+                seatsNumberCategoryAttrId,
                 "numberOfSeats",
                 "numberOfSeatsAttr",
                 "ref_Car",
-                new PostgresUUID(carCategoryId),
+                carCategoryId,
                 "STRING"
         );
 
         numberOfSeatsCategoryAttrValueId = dirtyData.createCategoryAttributeValueId();
         executePrepared("insert into sys_attr_value (id, category_attr_id, code, entity_id, string_value, version) values (?, ?, ?, ?, ?, 1)",
-                new PostgresUUID(numberOfSeatsCategoryAttrValueId),
-                new PostgresUUID(seatsNumberCategoryAttrId),
+                numberOfSeatsCategoryAttrValueId,
+                seatsNumberCategoryAttrId,
                 "numberOfSeatsAttr",
-                new PostgresUUID(carUuid),
+                carUuid,
                 "10"
         );
     }

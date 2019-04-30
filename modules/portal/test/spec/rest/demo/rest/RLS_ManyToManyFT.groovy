@@ -5,15 +5,15 @@
 
 package spec.rest.demo.rest
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID
+
 import com.haulmont.cuba.security.entity.ConstraintCheckType
 import com.haulmont.rest.demo.http.api.DataSet
 import groovy.sql.Sql
 import org.apache.http.HttpStatus
 import spock.lang.Specification
 
+import static spec.rest.demo.rest.DataUtils.*
 import static spec.rest.demo.rest.DbUtils.getSql
-import static DataUtils.*
 import static spec.rest.demo.rest.RestSpecsUtils.createRequest
 import static spec.rest.demo.rest.RestSpecsUtils.getAuthToken
 
@@ -230,19 +230,19 @@ class RLS_ManyToManyFT extends Specification {
 
     void assertModelLinksCount(int expectedCount) {
         def cntRow = sql.firstRow('select count(*) as cnt from ref_plant_model_link where plant_id = ?',
-                new PostgresUUID(plantId))
+                plantId)
         assert cntRow.cnt == expectedCount
     }
 
     void assertModelLinkExists(UUID plantId, UUID modelId) {
         def cntRow = sql.firstRow('select count(*) as cnt from ref_plant_model_link where plant_id = ? and model_id = ?',
-                new PostgresUUID(plantId), new PostgresUUID(modelId))
+                plantId, modelId)
         assert cntRow.cnt == 1
     }
 
     void assertNotDeletedModel(UUID modelId, String expectedName) {
         def descRow = sql.firstRow('select name from ref_model where id = ? and delete_ts is null',
-                new PostgresUUID(modelId))
+                modelId)
         assert descRow.name == expectedName
     }
 

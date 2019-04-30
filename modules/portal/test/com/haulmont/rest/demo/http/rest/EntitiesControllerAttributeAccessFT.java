@@ -7,7 +7,6 @@ package com.haulmont.rest.demo.http.rest;
 
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule;
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule;
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.masquerade.Connectors;
 import com.haulmont.rest.demo.http.api.DataSet;
 import com.haulmont.rest.demo.http.rest.jmx.SampleJmxService;
@@ -29,34 +28,28 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.*;
 import static org.junit.Assert.*;
 
 /**
+ *
  */
 public class EntitiesControllerAttributeAccessFT {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
-
-    private Connection conn;
-    private DataSet dirtyData = new DataSet();
-
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static EncryptionModule encryption = new BCryptEncryptionModule();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    private Connection conn;
+    private DataSet dirtyData = new DataSet();
     /**
      * Entitites ids
      */
     private String driver1UuidString, driver2UuidString, car1UuidString, car2UuidString;
-
     /**
      * User ids
      */
     private UUID driverReadUserId;
-
     /**
      * Logins
      */
     private String driverReadUserLogin = "driverReadUser";
-
-    private static EncryptionModule encryption = new BCryptEncryptionModule();
-
     private String driverReadUserPassword = "driverReadUser";
 
     /**
@@ -121,7 +114,7 @@ public class EntitiesControllerAttributeAccessFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_DRIVER where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(driverId));
+            stmt.setObject(1, driverId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String name = rs.getString("NAME");
@@ -150,7 +143,7 @@ public class EntitiesControllerAttributeAccessFT {
             ReadContext ctx = parseResponse(response);
             assertEquals(driver2UuidString, ctx.read("$.id"));
 
-            assertEquals("Driver#2" ,ctx.read("$.name"));
+            assertEquals("Driver#2", ctx.read("$.name"));
         }
     }
 
@@ -181,7 +174,7 @@ public class EntitiesControllerAttributeAccessFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_DRIVER where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(driver1UuidString)));
+            stmt.setObject(1, UUID.fromString(driver1UuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String name = rs.getString("NAME");
@@ -219,7 +212,7 @@ public class EntitiesControllerAttributeAccessFT {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_DRIVER where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(UUID.fromString(driver1UuidString)));
+                stmt.setObject(1, UUID.fromString(driver1UuidString));
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 String name = rs.getString("NAME");
@@ -301,7 +294,7 @@ public class EntitiesControllerAttributeAccessFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select CITY, COUNTRY from REF_DRIVER where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(driver1UuidString)));
+            stmt.setObject(1, UUID.fromString(driver1UuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String city = rs.getString("CITY");
@@ -388,11 +381,11 @@ public class EntitiesControllerAttributeAccessFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select CAR_ID from REF_DRIVER_ALLOC where DRIVER_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(driver1UuidString)));
+            stmt.setObject(1, UUID.fromString(driver1UuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
-            UUID carId = (UUID)rs.getObject("CAR_ID");
-            assertEquals(UUID.fromString(car1UuidString), carId);
+            String carId = (String) rs.getObject("CAR_ID");
+            assertEquals(car1UuidString, carId);
         }
     }
 
@@ -430,11 +423,11 @@ public class EntitiesControllerAttributeAccessFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select CAR_ID from REF_DRIVER_ALLOC where DRIVER_ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(driver2UuidString)));
+            stmt.setObject(1, UUID.fromString(driver2UuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
-            UUID carId = (UUID)rs.getObject("CAR_ID");
-            assertEquals(UUID.fromString(car2UuidString), carId);
+            String carId = (String) rs.getObject("CAR_ID");
+            assertEquals(car2UuidString, carId);
         }
     }
 
@@ -451,8 +444,8 @@ public class EntitiesControllerAttributeAccessFT {
 
 
     private void prepareDb() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         createDbData();
         createDbUsers();
     }
@@ -461,7 +454,7 @@ public class EntitiesControllerAttributeAccessFT {
         UUID driverUuid = dirtyData.createDriverUuid();
         driver1UuidString = driverUuid.toString();
         executePrepared("insert into ref_driver(id, version, name, status, city, state, country, DTYPE) values(?, ?, ?, ?, ?, ?, ?,'ref$ExtDriver')",
-                new PostgresUUID(driverUuid),
+                driverUuid,
                 1l,
                 "Driver#1",
                 10,
@@ -473,17 +466,17 @@ public class EntitiesControllerAttributeAccessFT {
         driverUuid = dirtyData.createDriverUuid();
         driver2UuidString = driverUuid.toString();
         executePrepared("insert into ref_driver(id, version, name, status, DTYPE) values(?, ?, ?, ?, 'ref$ExtDriver')",
-                new PostgresUUID(driverUuid),
+                driverUuid,
                 1l,
                 "Driver#2",
                 20
         );
-        
+
         UUID carUuid = dirtyData.createCarUuid();
         car1UuidString = carUuid.toString();
         executePrepared("insert into ref_car(id, version, vin) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(carUuid),
+                carUuid,
                 1l,
                 "001"
         );
@@ -492,7 +485,7 @@ public class EntitiesControllerAttributeAccessFT {
         car2UuidString = carUuid.toString();
         executePrepared("insert into ref_car(id, version, vin) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(carUuid),
+                carUuid,
                 1l,
                 "002"
         );
@@ -501,17 +494,17 @@ public class EntitiesControllerAttributeAccessFT {
 
         executePrepared("insert into ref_driver_alloc(id, car_id, driver_id) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(driverAllocUuid),
-                new PostgresUUID(UUID.fromString(car1UuidString)),
-                new PostgresUUID(UUID.fromString(driver1UuidString))
+                driverAllocUuid,
+                UUID.fromString(car1UuidString),
+                UUID.fromString(driver1UuidString)
         );
 
         driverAllocUuid = dirtyData.createDriverAllocUuid();
         executePrepared("insert into ref_driver_alloc(id, car_id, driver_id) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(driverAllocUuid),
-                new PostgresUUID(UUID.fromString(car1UuidString)),
-                new PostgresUUID(UUID.fromString(driver2UuidString))
+                driverAllocUuid,
+                UUID.fromString(car1UuidString),
+                UUID.fromString(driver2UuidString)
         );
     }
 
@@ -521,12 +514,12 @@ public class EntitiesControllerAttributeAccessFT {
         String pwd = encryption.getPasswordHash(driverReadUserId, driverReadUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(driverReadUserId),
+                driverReadUserId,
                 1l,
                 driverReadUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 driverReadUserLogin.toLowerCase()
         );
     }

@@ -7,7 +7,6 @@ package spec.rest.demo.rest
 
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID
 import com.haulmont.cuba.security.entity.ConstraintCheckType
 import com.haulmont.rest.demo.http.api.DataSet
 import groovy.sql.Sql
@@ -19,7 +18,7 @@ class DataUtils {
     static UUID createGroup(DataSet dataSet, Sql sql, String groupName) {
         def groupId = dataSet.createGroupUuid()
         sql.dataSet('sec_group').add(
-                id: new PostgresUUID(groupId),
+                id: groupId,
                 version: 1,
                 name: groupName
         )
@@ -33,12 +32,12 @@ class DataUtils {
                                  UUID groupId) {
         def constraintId = dataSet.createConstraintUuid()
         sql.dataSet('sec_constraint').add(
-                id: new PostgresUUID(constraintId),
+                id: constraintId,
                 version: 1,
                 check_type: checkType.getId(),
                 entity_name: metaClass,
                 groovy_script: expression,
-                group_id: new PostgresUUID(groupId)
+                group_id: groupId
         )
         return constraintId
     }
@@ -49,13 +48,13 @@ class DataUtils {
                            UUID groupId) {
         def userId = dataSet.createUserUuid()
         sql.dataSet('sec_user').add(
-                id: new PostgresUUID(userId),
+                id: userId,
                 version: 1,
                 login: login,
                 password: encryption.getPasswordHash(userId, password),
                 password_encryption: encryption.hashMethod,
                 login_lc: login.toLowerCase(),
-                group_id: new PostgresUUID(groupId)
+                group_id: groupId
         )
         return userId
     }
@@ -63,7 +62,7 @@ class DataUtils {
     static UUID createRole(DataSet dataSet, Sql sql, String name) {
         def roleId = dataSet.createRoleUuid()
         sql.dataSet('sec_role').add(
-                id: new PostgresUUID(roleId),
+                id: roleId,
                 version: 1,
                 name: name
         )
@@ -73,7 +72,7 @@ class DataUtils {
     static UUID createCar(DataSet dataSet, Sql sql, String vin) {
         def carId = dataSet.createCarUuid()
         sql.dataSet('ref_car').add(
-                id: new PostgresUUID(carId),
+                id: carId,
                 version: 1,
                 vin: vin
         )
@@ -83,23 +82,23 @@ class DataUtils {
     static UUID createInsuranceCase(DataSet dataSet, Sql sql, String description, UUID carId) {
         def caseId = dataSet.createInsuranceCaseUuid()
         sql.dataSet('ref_insurance_case').add(
-                id: new PostgresUUID(caseId),
+                id: caseId,
                 version: 1,
                 description: description,
-                car_id: new PostgresUUID(carId)
+                car_id: carId
         )
         return caseId
     }
 
     static void updateInsuranceCase(Sql sql, UUID caseId, String description) {
         sql.executeUpdate('update ref_insurance_case set description = ? where id = ?',
-                [description, new PostgresUUID(caseId)])
+                [description, caseId])
     }
 
     static UUID createPlant(DataSet dataSet, Sql sql, String name) {
         def plantId = dataSet.createPlantUuid()
         sql.dataSet('ref_plant').add(
-                id: new PostgresUUID(plantId),
+                id: plantId,
                 version: 1,
                 name: name,
                 dtype: 'ref$CustomExtPlant'
@@ -110,7 +109,7 @@ class DataUtils {
     static UUID createModel(DataSet dataSet, Sql sql, String name) {
         def modelId = dataSet.createModelUuid()
         sql.dataSet('ref_model').add(
-                id: new PostgresUUID(modelId),
+                id: modelId,
                 version: 1,
                 name: name,
                 dtype: 'ref$ExtModel'
@@ -120,13 +119,13 @@ class DataUtils {
 
     static void createPlantModelLink(Sql sql, UUID plantId, UUID modelId) {
         sql.dataSet('ref_plant_model_link').add(
-                plant_id: new PostgresUUID(plantId),
-                model_id: new PostgresUUID(modelId)
+                plant_id: plantId,
+                model_id: modelId
         )
     }
 
     static void updateModel(Sql sql, UUID modelId, String name) {
         sql.executeUpdate('update ref_model set name = ? where id = ?',
-                [name, new PostgresUUID(modelId)])
+                [name, modelId])
     }
 }

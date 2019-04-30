@@ -61,7 +61,7 @@ dependencies {
     appComponent("com.haulmont.addon.restapi:restapi-global:0.1-SNAPSHOT")
 }
 
-def postgres = 'org.postgresql:postgresql:42.2.4'
+def hsql = 'org.hsqldb:hsqldb:2.4.1'
 
 configure([globalModule, coreModule, webModule, portalModule]) {
     apply(plugin: 'java')
@@ -122,14 +122,14 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compileOnly(servletApi)
-        jdbc(postgres)
-        testRuntime(postgres)
+        jdbc(hsql)
+        testRuntime(hsql)
 
         testCompile("httpunit:httpunit:1.7")
         testCompile("rhino:js:1.7R2")
 
-        jdbc('org.hsqldb:hsqldb:2.3.3')
-        testRuntime('org.hsqldb:hsqldb:2.3.3')
+        jdbc('org.hsqldb:hsqldb:2.4.1')
+        testRuntime('org.hsqldb:hsqldb:2.4.1')
 
         compile('org.apache.directory.server:apacheds-protocol-ldap:2.0.0.AM25')
         compile('org.apache.directory.server:apacheds-core-annotations:2.0.0.AM25')
@@ -154,19 +154,19 @@ configure(coreModule) {
     }
 
     task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
-        dbms = 'postgres'
+        dbms = 'hsql'
         host = 'localhost'
-        dbName = 'refapp_6'
-        dbUser = 'root'
-        dbPassword = 'root'
+        dbName = 'rest_demo'
+        dbUser = 'sa'
+        dbPassword = ''
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
-        dbms = 'postgres'
+        dbms = 'hsql'
         host = 'localhost'
-        dbName = 'refapp_6'
-        dbUser = 'root'
-        dbPassword = 'root'
+        dbName = 'rest_demo'
+        dbUser = 'sa'
+        dbPassword = ''
     }
 }
 
@@ -236,6 +236,7 @@ configure(portalModule) {
         testCompile('com.squareup.retrofit2:converter-scalars:2.4.0')
 
         testCompile('org.postgresql:postgresql:42.2.4')
+        testCompile('org.hsqldb:hsqldb:2.4.1')
 
         testCompile("httpunit:httpunit:1.7")
         testCompile("rhino:js:1.7R2")

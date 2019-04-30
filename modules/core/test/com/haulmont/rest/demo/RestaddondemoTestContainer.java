@@ -1,15 +1,11 @@
 package com.haulmont.rest.demo;
 
-import com.haulmont.bali.util.Dom4j;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.testsupport.TestContainer;
 import com.haulmont.cuba.testsupport.TestContext;
 import com.haulmont.cuba.testsupport.TestDataSource;
-import org.dom4j.Document;
-import org.dom4j.Element;
 
 import javax.naming.NamingException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,10 +16,10 @@ public class RestaddondemoTestContainer extends TestContainer {
         appComponents = new ArrayList<>(Arrays.asList(
                 "com.haulmont.cuba",
                 // add CUBA premium add-ons here
-                 "com.haulmont.bpm",
+                "com.haulmont.bpm",
                 // "com.haulmont.charts",
                 // "com.haulmont.fts",
-                 "com.haulmont.reports",
+                "com.haulmont.reports",
                 // and custom app components if any
                 "com.haulmont.addon.restapi"
         ));
@@ -36,10 +32,10 @@ public class RestaddondemoTestContainer extends TestContainer {
                 // or add another one in the end.
                 "com/haulmont/cuba/testsupport/test-app.properties");
 
-        dbDriver = "org.postgresql.Driver";
-        dbUrl = "jdbc:postgresql://localhost/refapp_6";
-        dbUser = "root";
-        dbPassword = "root";
+        dbDriver = "org.hsqldb.jdbc.JDBCDriver";
+        dbUrl = "jdbc:hsqldb:hsql://localhost/rest_demo";
+        dbUser = "sa";
+        dbPassword = "";
 
     }
 

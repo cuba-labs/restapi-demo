@@ -29,8 +29,6 @@
     <class>com.haulmont.cuba.core.entity.ScheduledTask</class>
     <class>com.haulmont.cuba.core.entity.ScheduledExecution</class>
     <class>com.haulmont.cuba.core.entity.QueryResult</class>
-    <class>com.haulmont.cuba.core.entity.AccessToken</class>
-    <class>com.haulmont.cuba.core.entity.RefreshToken</class>
     <class>com.haulmont.cuba.security.entity.User</class>
     <class>com.haulmont.cuba.security.entity.Role</class>
     <class>com.haulmont.cuba.security.entity.UserRole</class>
@@ -69,6 +67,8 @@
     <class>com.haulmont.reports.entity.ReportTemplate</class>
     <class>com.haulmont.reports.entity.Report</class>
     <class>com.haulmont.reports.entity.ReportGroup</class>
+    <class>com.haulmont.addon.restapi.entity.AccessToken</class>
+    <class>com.haulmont.addon.restapi.entity.RefreshToken</class>
     <class>com.haulmont.rest.demo.core.entity.Address</class>
     <class>com.haulmont.rest.demo.core.entity.Colour</class>
     <class>com.haulmont.rest.demo.core.entity.Model</class>
@@ -109,7 +109,7 @@
       <property name="eclipselink.logging.logger" value="com.haulmont.cuba.core.sys.logging.EclipseLinkLog"/>
       <property name="eclipselink.cache.shared.default" value="false"/>
       <property name="eclipselink.flush-clear.cache" value="Merge"/>
-      <property name="eclipselink.target-database" value="com.haulmont.cuba.core.sys.persistence.CubaPostgreSQLPlatform"/>
+      <property name="eclipselink.target-database" value="com.haulmont.cuba.core.sys.persistence.CubaHSQLPlatform"/>
       <property name="javax.persistence.validation.mode" value="NONE"/>
       <property name="eclipselink.cache.coordination.protocol" value="com.haulmont.cuba.core.sys.entitycache.EntityCacheTransportManager"/>
       <property name="eclipselink.weaving" value="static"/>

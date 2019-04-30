@@ -5,7 +5,6 @@
 
 package com.haulmont.rest.demo.http.rest;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.jayway.jsonpath.ReadContext;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -37,6 +36,7 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.statusCode;
 import static org.junit.Assert.*;
 
 /**
+ *
  */
 public class FilesControllerFT extends AbstractRestControllerFT {
 
@@ -70,7 +70,7 @@ public class FilesControllerFT extends AbstractRestControllerFT {
             assertEquals(URI_BASE + "/files/" + fileDescriptorId, location.getValue());
 
             try (PreparedStatement stmt = conn.prepareStatement("select NAME, EXT, FILE_SIZE from SYS_FILE where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(UUID.fromString(fileDescriptorId)));
+                stmt.setObject(1, UUID.fromString(fileDescriptorId));
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 assertEquals(fileName, rs.getString("NAME"));
@@ -107,7 +107,7 @@ public class FilesControllerFT extends AbstractRestControllerFT {
             assertEquals(URI_BASE + "/files/" + fileDescriptorId, location.getValue());
 
             try (PreparedStatement stmt = conn.prepareStatement("select NAME, EXT, FILE_SIZE from SYS_FILE where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(UUID.fromString(fileDescriptorId)));
+                stmt.setObject(1, UUID.fromString(fileDescriptorId));
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 assertEquals(fileDescriptorId, rs.getString("NAME"));
@@ -209,7 +209,7 @@ public class FilesControllerFT extends AbstractRestControllerFT {
             assertTrue(ctx.read("$.size", Integer.class) > 0);
 
             try (PreparedStatement stmt = conn.prepareStatement("select NAME, EXT, FILE_SIZE from SYS_FILE where ID = ?")) {
-                stmt.setObject(1, new PostgresUUID(UUID.fromString(fileDescriptorId)));
+                stmt.setObject(1, UUID.fromString(fileDescriptorId));
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
                 assertEquals(fileName, rs.getString("NAME"));

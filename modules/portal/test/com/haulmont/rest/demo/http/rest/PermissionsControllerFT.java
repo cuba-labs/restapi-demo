@@ -7,7 +7,6 @@ package com.haulmont.rest.demo.http.rest;
 
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule;
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule;
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.cuba.security.entity.PermissionType;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.rest.demo.http.api.DataSet;
@@ -34,14 +33,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class PermissionsControllerFT {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
-
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static EncryptionModule encryption = new BCryptEncryptionModule();
     private Connection conn;
     private DataSet dirtyData = new DataSet();
     private String oauthToken;
     private UUID roleId;
-
-    private static EncryptionModule encryption = new BCryptEncryptionModule();
     private UUID groupUuid = UUID.fromString("0fa2b1a5-1d68-4d69-9fbd-dff348347f93");
     private String testUserLogin = "testUser";
     private String testUserPassword = "test";
@@ -49,8 +46,8 @@ public class PermissionsControllerFT {
 
     @Before
     public void setUp() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         prepareDb();
         oauthToken = getAuthToken(testUserLogin, testUserPassword);
     }
@@ -81,19 +78,19 @@ public class PermissionsControllerFT {
         String pwd = encryption.getPasswordHash(testUserId, testUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(testUserId),
+                testUserId,
                 1l,
                 testUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 testUserLogin.toLowerCase()
         );
 
 
         roleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(roleId),
+                roleId,
                 RoleType.READONLY.getId(),
                 "testRole"
         );
@@ -105,8 +102,8 @@ public class PermissionsControllerFT {
         //testRole forbids to update cars
         UUID cantUpdateCarPrmsId = dirtyData.createPermissionUuid();
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(cantUpdateCarPrmsId),
-                new PostgresUUID(roleId),
+                cantUpdateCarPrmsId,
+                roleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref_Car:update",
                 DENY
@@ -115,8 +112,8 @@ public class PermissionsControllerFT {
         //testRole forbids currencies browser screen
         UUID currenciesScreenPrmsId = dirtyData.createPermissionUuid();
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(currenciesScreenPrmsId),
-                new PostgresUUID(roleId),
+                currenciesScreenPrmsId,
+                roleId,
                 PermissionType.SCREEN.getId(),
                 "ref$Currency.browse",
                 DENY
@@ -125,8 +122,8 @@ public class PermissionsControllerFT {
         //testRole forbids currencies browser screen
         UUID entityAttrModifyAllowPrmsId = dirtyData.createPermissionUuid();
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(entityAttrModifyAllowPrmsId),
-                new PostgresUUID(roleId),
+                entityAttrModifyAllowPrmsId,
+                roleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref$Currency.name",
                 PROPERTY_MODIFY
@@ -135,9 +132,9 @@ public class PermissionsControllerFT {
         UUID id = UUID.randomUUID();
         //colorReadUser has colorReadRole role (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(testUserId),
-                new PostgresUUID(roleId)
+                id,
+                testUserId,
+                roleId
         );
 
     }

@@ -33,7 +33,7 @@ public class BeanValidationFT extends AbstractRestControllerFT {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
 
     private Connection conn;
     private DataSet dirtyData = new DataSet();
@@ -41,8 +41,8 @@ public class BeanValidationFT extends AbstractRestControllerFT {
     @Before
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         prepareDb();
     }
 
@@ -93,7 +93,7 @@ public class BeanValidationFT extends AbstractRestControllerFT {
         executePrepared("insert into REF_CURRENCY (CODE, NAME, UUID, VERSION) values (?, ?, ?, 1)",
                 currencyCode,
                 "Dollar-1",
-                new PostgresUUID(UUID.randomUUID()));
+                UUID.randomUUID());
 
         dirtyData.addCurrencyId(currencyCode);
 

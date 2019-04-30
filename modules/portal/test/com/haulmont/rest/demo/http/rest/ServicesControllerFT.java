@@ -5,7 +5,6 @@
 
 package com.haulmont.rest.demo.http.rest;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.rest.demo.core.app.PortalTestService;
 import com.haulmont.rest.demo.http.api.DataSet;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -30,11 +29,9 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 
 public class ServicesControllerFT {
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
-
     private Connection conn;
     private DataSet dirtyData = new DataSet();
     private String oauthToken;
@@ -47,8 +44,8 @@ public class ServicesControllerFT {
     @Before
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         prepareDb();
     }
 
@@ -217,7 +214,8 @@ public class ServicesControllerFT {
             try {
                 readContext.read("$.vin");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -246,7 +244,8 @@ public class ServicesControllerFT {
             try {
                 readContext.read("$.[0].vin");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -278,7 +277,8 @@ public class ServicesControllerFT {
             try {
                 readContext.read("$.[0].vin");
                 fail();
-            } catch (PathNotFoundException ignored) {}
+            } catch (PathNotFoundException ignored) {
+            }
         }
     }
 
@@ -391,6 +391,7 @@ public class ServicesControllerFT {
 
     /**
      * Collection parameter in JSON may not contain _entityName attribute for each item. Entity type must be recognized automatically
+     *
      * @throws Exception
      */
     @Test
@@ -455,7 +456,7 @@ public class ServicesControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("field1 value", ctx.read("$.field1"));
             assertEquals("2017-01-15 17:56:00.000", ctx.read("$.dateField"));
-            assertEquals((Integer)2, ctx.read("$.nestedPojo.nestedField", Integer.class));
+            assertEquals((Integer) 2, ctx.read("$.nestedPojo.nestedField", Integer.class));
         }
     }
 
@@ -467,7 +468,7 @@ public class ServicesControllerFT {
             assertEquals(2, ctx.<Collection>read("$").size());
             assertEquals("pojo1", ctx.read("$.[0].field1"));
             assertEquals("2017-01-15 17:56:00.000", ctx.read("$.[0].dateField"));
-            assertEquals((int)1, (int)ctx.<Integer>read("$.[0].nestedPojo.nestedField"));
+            assertEquals((int) 1, (int) ctx.<Integer>read("$.[0].nestedPojo.nestedField"));
             assertEquals("pojo2", ctx.read("$.[1].field1"));
         }
     }
@@ -506,7 +507,7 @@ public class ServicesControllerFT {
                 oauthToken, paramsJson, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
-            assertEquals((Integer)2, ctx.read("$", Integer.class));
+            assertEquals((Integer) 2, ctx.read("$", Integer.class));
         }
     }
 
@@ -517,7 +518,7 @@ public class ServicesControllerFT {
                 oauthToken, paramsJson, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
-            assertEquals((Integer)2, ctx.read("$", Integer.class));
+            assertEquals((Integer) 2, ctx.read("$", Integer.class));
         }
     }
 
@@ -689,7 +690,7 @@ public class ServicesControllerFT {
                 oauthToken, paramsJson, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
-            assertEquals((Integer)4, ctx.read("$", Integer.class));
+            assertEquals((Integer) 4, ctx.read("$", Integer.class));
         }
     }
 
@@ -710,36 +711,36 @@ public class ServicesControllerFT {
         UUID colourId = dirtyData.createColourUuid();
         colourUuidString = colourId.toString();
         executePrepared("insert into ref_colour(id, version, name) values (?, ?, ?)",
-                new PostgresUUID(colourId),
+                colourId,
                 1L,
                 "Red");
 
         UUID carUuid = dirtyData.createCarUuid();
         carUuidString = carUuid.toString();
         executePrepared("insert into ref_car(id, version, vin, colour_id) values(?, ?, ?, ?)",
-                new PostgresUUID(carUuid),
+                carUuid,
                 1L,
                 "VWV000",
-                new PostgresUUID(colourId)
+                colourId
         );
 
         UUID secondCarUuid = dirtyData.createCarUuid();
         secondCarUuidString = secondCarUuid.toString();
         executePrepared("insert into ref_car(id, version, vin, colour_id) values(?, ?, ?, ?)",
-                new PostgresUUID(secondCarUuid),
+                secondCarUuid,
                 1L,
                 "VWV002",
-                new PostgresUUID(colourId)
+                colourId
         );
 
         UUID repairId = dirtyData.createRepairUuid();
         repairUuidString = repairId.toString();
         executePrepared("insert into ref_repair(id, car_id, repair_date, version) values (?, ?, ?, ?)",
-                new PostgresUUID(repairId),
-                new PostgresUUID(carUuid),
+                repairId,
+                carUuid,
                 java.sql.Date.valueOf("2012-01-13"),
                 1L
-                );
+        );
 
 
         dirtyData.createRepairUuid();

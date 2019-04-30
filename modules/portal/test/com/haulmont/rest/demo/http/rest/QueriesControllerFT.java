@@ -5,7 +5,6 @@
 
 package com.haulmont.rest.demo.http.rest;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 import org.apache.http.Header;
@@ -23,13 +22,12 @@ import java.util.*;
 
 import static com.haulmont.rest.demo.http.rest.RestTestUtils.*;
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
+ *
  */
-public class QueriesControllerFT extends AbstractRestControllerFT{
+public class QueriesControllerFT extends AbstractRestControllerFT {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -42,25 +40,25 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
             UUID colourId = dirtyData.createColourUuid();
             coloursUuids.add(colourId);
             executePrepared("insert into ref_colour(id, name, version) values (?, ?, 1)",
-                    new PostgresUUID(colourId),
+                    colourId,
                     "Colour " + i);
         }
 
 
         UUID modelId = dirtyData.createModelUuid();
         executePrepared("insert into ref_model(id, name, version) values (?, ?, 1)",
-                new PostgresUUID(modelId),
+                modelId,
                 "Audi TT");
 
         UUID carId = dirtyData.createCarUuid();
         executePrepared("insert into ref_car(id, vin, model_id, version) values (?, ?, ?, 1)",
-                new PostgresUUID(carId),
+                carId,
                 "001",
-                new PostgresUUID(modelId));
+                modelId);
     }
 
     @Test
-    public void executeQuery() throws Exception{
+    public void executeQuery() throws Exception {
         String url = "/queries/sec$User/userByLogin";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -81,7 +79,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithSessionParameter() throws Exception{
+    public void executeQueryWithSessionParameter() throws Exception {
         String url = "/queries/sec$User/currentUser";
         Map<String, String> params = new HashMap<>();
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
@@ -94,7 +92,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithStringCollectionParameter() throws Exception{
+    public void executeQueryWithStringCollectionParameter() throws Exception {
         String url = "/queries/ref$Colour/coloursByNames";
         Map<String, String> params = new HashMap<>();
         params.put("returnCount", "true");
@@ -113,7 +111,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithUuidCollectionParameter() throws Exception{
+    public void executeQueryWithUuidCollectionParameter() throws Exception {
         String url = "/queries/ref$Colour/coloursByIds";
         Map<String, String> params = new HashMap<>();
         params.put("returnCount", "true");
@@ -137,7 +135,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithCountHeader() throws Exception{
+    public void executeQueryWithCountHeader() throws Exception {
         String url = "/queries/sec$User/userByLogin";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -156,7 +154,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithExplicitView() throws Exception{
+    public void executeQueryWithExplicitView() throws Exception {
         String url = "/queries/sec$User/userByLogin?view=_local";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -172,7 +170,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithExplicitViewThatIsMissing() throws Exception{
+    public void executeQueryWithExplicitViewThatIsMissing() throws Exception {
         String missingViewName = "missingView";
         String url = "/queries/sec$User/userByLogin?view=" + missingViewName;
         Map<String, String> params = new HashMap<>();
@@ -186,7 +184,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithNullsSerialization() throws Exception{
+    public void executeQueryWithNullsSerialization() throws Exception {
         String url = "/queries/sec$User/userByLogin?returnNulls=true";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -202,7 +200,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void getCountForQuery() throws Exception{
+    public void getCountForQuery() throws Exception {
         String url = "/queries/sec$User/userByLogin/count";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -214,7 +212,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void getCountForQueryText() throws Exception{
+    public void getCountForQueryText() throws Exception {
         String url = "/queries/sec$User/userByLogin/count";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -229,7 +227,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void getCountForEntitiesList() throws Exception{
+    public void getCountForEntitiesList() throws Exception {
         String url = "/queries/sec$User/all/count";
         try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
@@ -239,7 +237,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryMissingName() throws Exception{
+    public void executeQueryMissingName() throws Exception {
         String url = "/queries/sec$User/missingQueryName";
         Map<String, String> params = new HashMap<>();
         params.put("login", "admin");
@@ -251,7 +249,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryMissingParameter() throws Exception{
+    public void executeQueryMissingParameter() throws Exception {
         String url = "/queries/sec$User/userByLogin";
         Map<String, String> params = new HashMap<>();
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
@@ -304,7 +302,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void executeQueryWithTransform() throws Exception{
+    public void executeQueryWithTransform() throws Exception {
         String url = "/queries/ref$OldCar/carByVin";
         Map<String, String> params = new HashMap<>();
         params.put("vin", "001");
@@ -327,7 +325,7 @@ public class QueriesControllerFT extends AbstractRestControllerFT{
     }
 
     @Test
-    public void getCountForQueryWithTransform() throws Exception{
+    public void getCountForQueryWithTransform() throws Exception {
         String url = "/queries/ref$OldCar/carByVin/count";
         Map<String, String> params = new HashMap<>();
         params.put("vin", "001");

@@ -5,7 +5,6 @@
 
 package spec.rest.demo.rest
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID
 import com.haulmont.cuba.security.entity.ConstraintCheckType
 import com.haulmont.masquerade.Connectors
 import com.haulmont.rest.demo.http.api.DataSet
@@ -16,8 +15,8 @@ import org.apache.http.HttpStatus
 import spock.lang.Specification
 
 import static org.hamcrest.CoreMatchers.notNullValue
+import static spec.rest.demo.rest.DataUtils.*
 import static spec.rest.demo.rest.DbUtils.getSql
-import static DataUtils.*
 import static spec.rest.demo.rest.RestSpecsUtils.createRequest
 import static spec.rest.demo.rest.RestSpecsUtils.getAuthToken
 
@@ -91,8 +90,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()],
                         ['id': case3Id.toString()]
                 ],
@@ -126,8 +125,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()],
                         ['id': case3Id.toString()],
                         ['id': case4Id.toString(), 'description': 'InsuranceCase#4_']
@@ -160,8 +159,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()],
                         ['id': case3Id.toString()],
                         ['id': case2Id.toString(), 'description': 'InsuranceCase#2_2']
@@ -194,8 +193,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()],
                         ['id': case3Id.toString(), 'description': 'InsuranceCase#3_3'],
                 ],
@@ -227,8 +226,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()]
                 ],
                 '__securityToken': securityToken
@@ -276,8 +275,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [
+                'id'             : carId.toString(),
+                'insuranceCases' : [
                         ['id': case1Id.toString()]
                 ],
                 '__securityToken': securityToken
@@ -329,8 +328,8 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
         when:
 
         def body = [
-                'id'            : carId.toString(),
-                'insuranceCases': [],
+                'id'             : carId.toString(),
+                'insuranceCases' : [],
                 '__securityToken': securityToken
 
         ]
@@ -347,19 +346,19 @@ class RLS_OneToMany_SecurityTokenOnClientFT extends Specification {
 
     void testCaseCount(int expectedCount) {
         def cntRow = sql.firstRow('select count(*) as cnt from REF_INSURANCE_CASE where car_id = ? and delete_ts is null',
-                new PostgresUUID(carId))
+                carId)
         assert cntRow.cnt == expectedCount
     }
 
     void testNotDeletedCase(UUID carId, UUID caseId, String expectedDescription) {
         def descRow = sql.firstRow('select DESCRIPTION as desc from REF_INSURANCE_CASE where car_id = ? and id = ? and delete_ts is null',
-                new PostgresUUID(carId), new PostgresUUID(caseId))
+                carId, caseId)
         assert descRow.desc == expectedDescription
     }
 
     void testDeletedCase(UUID carId, UUID caseId, String expectedDescription) {
         def descRow = sql.firstRow('select DESCRIPTION as desc from REF_INSURANCE_CASE where car_id = ? and id = ? and delete_ts is not null',
-                new PostgresUUID(carId), new PostgresUUID(caseId))
+                carId, caseId)
         assert descRow.desc == expectedDescription
     }
 }

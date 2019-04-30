@@ -18,7 +18,7 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.getAuthToken;
 @Ignore
 public abstract class AbstractRestControllerFT {
 
-    protected static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
+    protected static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
 
     protected Connection conn;
     protected DataSet dirtyData = new DataSet();
@@ -27,8 +27,8 @@ public abstract class AbstractRestControllerFT {
     @Before
     public void setUp() throws Exception {
         oauthToken = getAuthToken("admin", "admin");
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         prepareDb();
     }
 
