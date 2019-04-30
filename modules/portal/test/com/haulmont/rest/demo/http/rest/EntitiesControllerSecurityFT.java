@@ -7,7 +7,6 @@ package com.haulmont.rest.demo.http.rest;
 
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule;
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule;
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.cuba.security.entity.PermissionType;
 import com.haulmont.cuba.security.entity.RoleType;
 import com.haulmont.rest.demo.core.app.PortalTestService;
@@ -32,24 +31,22 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.*;
 import static org.junit.Assert.*;
 
 /**
+ *
  */
 public class EntitiesControllerSecurityFT {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
-
-    private Connection conn;
-    private DataSet dirtyData = new DataSet();
-
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static EncryptionModule encryption = new BCryptEncryptionModule();
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    private Connection conn;
+    private DataSet dirtyData = new DataSet();
     /**
      * Entitites ids
      */
     private String carUuidString;
     private String colourUuidString;
     private String driverUuidString;
-
     /**
      * User ids
      */
@@ -58,7 +55,6 @@ public class EntitiesControllerSecurityFT {
     private UUID colorCreateUserId;
     private UUID colorDeleteUserId;
     private UUID carReadUserId;
-
     /**
      * Logins
      */
@@ -67,9 +63,6 @@ public class EntitiesControllerSecurityFT {
     private String colorCreateUserLogin = "colorCreateUser";
     private String colorDeleteUserLogin = "colorDeleteUser";
     private String carReadUserLogin = "carReadUser";
-
-    private static EncryptionModule encryption = new BCryptEncryptionModule();
-
     private String colorReadUserPassword = "colorReadUser";
     private String colorUpdateUserPassword = "colorUpdateUser";
     private String colorCreateUserPassword = "colorCreateUser";
@@ -206,7 +199,7 @@ public class EntitiesControllerSecurityFT {
     public void updateForbiddenEntity() throws Exception {
         String url = "/entities/ref$Colour/" + colourUuidString;
         String json = getFileContent("colour.json", null);
-        try (CloseableHttpResponse response = sendPut(url, colorReadUserToken, json,  null)) {
+        try (CloseableHttpResponse response = sendPut(url, colorReadUserToken, json, null)) {
             assertEquals(HttpStatus.SC_FORBIDDEN, statusCode(response));
         }
     }
@@ -223,7 +216,7 @@ public class EntitiesControllerSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION from REF_COLOUR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(colourUuidString)));
+            stmt.setObject(1, UUID.fromString(colourUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description = rs.getString("DESCRIPTION");
@@ -244,7 +237,7 @@ public class EntitiesControllerSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_COLOUR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(colourUuidString)));
+            stmt.setObject(1, UUID.fromString(colourUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String name = rs.getString("NAME");
@@ -261,15 +254,15 @@ public class EntitiesControllerSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select NAME from REF_COLOUR where ID = ?")) {
-            stmt.setObject(1, new PostgresUUID(UUID.fromString(colourUuidString)));
+            stmt.setObject(1, UUID.fromString(colourUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
         }
     }
 
     private void prepareDb() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
         createDbData();
         createDbUsers();
         createDbRoles();
@@ -289,8 +282,8 @@ public class EntitiesControllerSecurityFT {
         UUID canReadColorPrmsId = dirtyData.createPermissionUuid();
         //colourReadRole allows to read colours
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canReadColorPrmsId),
-                new PostgresUUID(colorReadRoleId),
+                canReadColorPrmsId,
+                colorReadRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref$Colour:read",
                 PERMIT
@@ -299,8 +292,8 @@ public class EntitiesControllerSecurityFT {
         UUID cantReadCarPrmsID = dirtyData.createPermissionUuid();
         //colorReadRole prohibits to read cars
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(cantReadCarPrmsID),
-                new PostgresUUID(colorReadRoleId),
+                cantReadCarPrmsID,
+                colorReadRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref_Car:read",
                 FORBID
@@ -309,8 +302,8 @@ public class EntitiesControllerSecurityFT {
         UUID canUpdateColorPrmsId = dirtyData.createPermissionUuid();
         //colorUpdateRole allows to update colours
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canUpdateColorPrmsId),
-                new PostgresUUID(colorUpdateRoleId),
+                canUpdateColorPrmsId,
+                colorUpdateRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref$Colour:update",
                 PERMIT
@@ -319,8 +312,8 @@ public class EntitiesControllerSecurityFT {
         UUID canCreateColorPrmsId = dirtyData.createPermissionUuid();
         //colorCreateRole allows to create colours
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canCreateColorPrmsId),
-                new PostgresUUID(colorCreateRoleId),
+                canCreateColorPrmsId,
+                colorCreateRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref$Colour:create",
                 PERMIT
@@ -329,8 +322,8 @@ public class EntitiesControllerSecurityFT {
         UUID canDeleteColorPrmsId = dirtyData.createPermissionUuid();
         //colorDeleteRole allows to delete colours
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canDeleteColorPrmsId),
-                new PostgresUUID(colorDeleteRoleId),
+                canDeleteColorPrmsId,
+                colorDeleteRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref$Colour:delete",
                 PERMIT
@@ -339,8 +332,8 @@ public class EntitiesControllerSecurityFT {
         UUID cantUpdateCarPrmsId = dirtyData.createPermissionUuid();
         //colorUpdateRole prohibits to update cars
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(cantUpdateCarPrmsId),
-                new PostgresUUID(colorUpdateRoleId),
+                cantUpdateCarPrmsId,
+                colorUpdateRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref_Car:update",
                 FORBID
@@ -349,8 +342,8 @@ public class EntitiesControllerSecurityFT {
         UUID cantReadColorPrmsId = dirtyData.createPermissionUuid();
         //noColorReadRole prohibits to view colors
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(cantReadColorPrmsId),
-                new PostgresUUID(noColorReadRoleId),
+                cantReadColorPrmsId,
+                noColorReadRoleId,
                 PermissionType.ENTITY_OP.getId(),
                 "ref$Colour:read",
                 FORBID
@@ -365,8 +358,8 @@ public class EntitiesControllerSecurityFT {
         UUID canReadCarModelPrmsId = dirtyData.createPermissionUuid();
         //carReadRole allows to view car's model
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canReadCarModelPrmsId),
-                new PostgresUUID(carReadRoleId),
+                canReadCarModelPrmsId,
+                carReadRoleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref_Car:model",
                 VIEW
@@ -375,8 +368,8 @@ public class EntitiesControllerSecurityFT {
         UUID canReadCarColorPrmsId = dirtyData.createPermissionUuid();
         //carReadRole cannot read or modify car's color
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canReadCarColorPrmsId),
-                new PostgresUUID(carReadRoleId),
+                canReadCarColorPrmsId,
+                carReadRoleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref_Car:colour",
                 DENY
@@ -385,8 +378,8 @@ public class EntitiesControllerSecurityFT {
         UUID canModifyCarVinPrmsId = dirtyData.createPermissionUuid();
         //carReadRole allows to modify car's vin
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(canModifyCarVinPrmsId),
-                new PostgresUUID(carReadRoleId),
+                canModifyCarVinPrmsId,
+                carReadRoleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref_Car:vin",
                 MODIFY
@@ -395,8 +388,8 @@ public class EntitiesControllerSecurityFT {
         UUID denyCarDriverAllocsPrmsId = dirtyData.createPermissionUuid();
         //carReadRole cannot read or modify car's driver allocations
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(denyCarDriverAllocsPrmsId),
-                new PostgresUUID(carReadRoleId),
+                denyCarDriverAllocsPrmsId,
+                carReadRoleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref_Car:driverAllocations",
                 DENY
@@ -406,8 +399,8 @@ public class EntitiesControllerSecurityFT {
         UUID denyColourDescriptionUpdatePrmsId = dirtyData.createPermissionUuid();
         //carUpdateRole cannot update colour property
         executePrepared("insert into sec_permission(id, role_id, permission_type, target, value_) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(denyColourDescriptionUpdatePrmsId),
-                new PostgresUUID(colorUpdateRoleId),
+                denyColourDescriptionUpdatePrmsId,
+                colorUpdateRoleId,
                 PermissionType.ENTITY_ATTR.getId(),
                 "ref$Colour:description",
                 DENY
@@ -418,49 +411,49 @@ public class EntitiesControllerSecurityFT {
         UUID id = UUID.randomUUID();
         //colorReadUser has colorReadRole role (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(colorReadUserId),
-                new PostgresUUID(colorReadRoleId)
+                id,
+                colorReadUserId,
+                colorReadRoleId
         );
 
         id = UUID.randomUUID();
         //colorUpdateUser has colorUpdateRole (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(colorUpdateUserId),
-                new PostgresUUID(colorUpdateRoleId)
+                id,
+                colorUpdateUserId,
+                colorUpdateRoleId
         );
 
         id = UUID.randomUUID();
         //colorCreateUser has colorCreateRole (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(colorCreateUserId),
-                new PostgresUUID(colorCreateRoleId)
+                id,
+                colorCreateUserId,
+                colorCreateRoleId
         );
 
         id = UUID.randomUUID();
         //colorDeleteUser has colorDeleteRole (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(colorDeleteUserId),
-                new PostgresUUID(colorDeleteRoleId)
+                id,
+                colorDeleteUserId,
+                colorDeleteRoleId
         );
 
         id = UUID.randomUUID();
         //carReadUser has carReadRole (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(carReadUserId),
-                new PostgresUUID(carReadRoleId)
+                id,
+                carReadUserId,
+                carReadRoleId
         );
 
         id = UUID.randomUUID();
         //carReadUser has noColorReadRole (read-only)
         executePrepared("insert into sec_user_role(id, user_id, role_id) values(?, ?, ?)",
-                new PostgresUUID(id),
-                new PostgresUUID(carReadUserId),
-                new PostgresUUID(noColorReadRoleId)
+                id,
+                carReadUserId,
+                noColorReadRoleId
         );
     }
 
@@ -468,7 +461,7 @@ public class EntitiesControllerSecurityFT {
         //read-only role. can read colours, can't read cars
         colorReadRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(colorReadRoleId),
+                colorReadRoleId,
                 RoleType.READONLY.getId(),
                 "colorReadRole"
         );
@@ -476,7 +469,7 @@ public class EntitiesControllerSecurityFT {
         //read_only role. can update colours, can't update cars
         colorUpdateRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(colorUpdateRoleId),
+                colorUpdateRoleId,
                 RoleType.READONLY.getId(),
                 "colorUpdateRole"
         );
@@ -484,7 +477,7 @@ public class EntitiesControllerSecurityFT {
         //read-only role. can create colours
         colorCreateRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(colorCreateRoleId),
+                colorCreateRoleId,
                 RoleType.READONLY.getId(),
                 "colorCreateRole"
         );
@@ -492,7 +485,7 @@ public class EntitiesControllerSecurityFT {
         //read-only role. can delete colours
         colorDeleteRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(colorDeleteRoleId),
+                colorDeleteRoleId,
                 RoleType.READONLY.getId(),
                 "colorDeleteRole"
         );
@@ -500,7 +493,7 @@ public class EntitiesControllerSecurityFT {
         //read-only role for attributes access tests
         carReadRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(carReadRoleId),
+                carReadRoleId,
                 RoleType.READONLY.getId(),
                 "carReadRole"
         );
@@ -508,7 +501,7 @@ public class EntitiesControllerSecurityFT {
         //read-only role, prohibiting viewing the colors
         noColorReadRoleId = dirtyData.createRoleUuid();
         executePrepared("insert into sec_role(id, role_type, name) values(?, ?, ?)",
-                new PostgresUUID(noColorReadRoleId),
+                noColorReadRoleId,
                 RoleType.READONLY.getId(),
                 "noColorReadRole"
         );
@@ -518,7 +511,7 @@ public class EntitiesControllerSecurityFT {
         UUID colourUuid = dirtyData.createColourUuid();
         colourUuidString = colourUuid.toString();
         executePrepared("insert into ref_colour(id, version, name, description) values(?, ?, ?, ?)",
-                new PostgresUUID(colourUuid),
+                colourUuid,
                 1L,
                 "Red",
                 "Description"
@@ -527,7 +520,7 @@ public class EntitiesControllerSecurityFT {
         UUID modelUuid = dirtyData.createModelUuid();
         modelUuidString = modelUuid.toString();
         executePrepared("insert into ref_model(id, version, name) values(?, ?, ?)",
-                new PostgresUUID(modelUuid),
+                modelUuid,
                 1L,
                 "Audi"
         );
@@ -535,17 +528,17 @@ public class EntitiesControllerSecurityFT {
         UUID carUuid = dirtyData.createCarUuid();
         carUuidString = carUuid.toString();
         executePrepared("insert into ref_car(id, version, vin, colour_id, model_id) values(?, ?, ?, ?, ?)",
-                new PostgresUUID(carUuid),
+                carUuid,
                 1l,
                 "VWV000",
-                new PostgresUUID(colourUuid),
-                new PostgresUUID(modelUuid)
+                colourUuid,
+                modelUuid
         );
 
         UUID driverUuid = dirtyData.createDriverUuid();
         driverUuidString = driverUuid.toString();
         executePrepared("insert into ref_driver(id, version, name, DTYPE) values(?, ?, ?, 'ref$ExtDriver')",
-                new PostgresUUID(driverUuid),
+                driverUuid,
                 1l,
                 "Driver"
         );
@@ -557,12 +550,12 @@ public class EntitiesControllerSecurityFT {
         String pwd = encryption.getPasswordHash(colorReadUserId, colorReadUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(colorReadUserId),
+                colorReadUserId,
                 1l,
                 colorReadUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 "colorreaduser"
         );
 
@@ -571,12 +564,12 @@ public class EntitiesControllerSecurityFT {
         pwd = encryption.getPasswordHash(colorUpdateUserId, colorUpdateUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(colorUpdateUserId),
+                colorUpdateUserId,
                 1l,
                 colorUpdateUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 "colorupdateuser"
         );
 
@@ -585,12 +578,12 @@ public class EntitiesControllerSecurityFT {
         pwd = encryption.getPasswordHash(colorCreateUserId, colorCreateUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(colorCreateUserId),
+                colorCreateUserId,
                 1l,
                 colorCreateUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 "colorcreateuser"
         );
 
@@ -599,12 +592,12 @@ public class EntitiesControllerSecurityFT {
         pwd = encryption.getPasswordHash(colorDeleteUserId, colorDeleteUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(colorDeleteUserId),
+                colorDeleteUserId,
                 1l,
                 colorDeleteUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 "colordeleteuser"
         );
 
@@ -613,12 +606,12 @@ public class EntitiesControllerSecurityFT {
         pwd = encryption.getPasswordHash(carReadUserId, carReadUserPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(carReadUserId),
+                carReadUserId,
                 1l,
                 carReadUserLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupUuid), //"Company" group
+                groupUuid, //"Company" group
                 "carreaduser"
         );
     }

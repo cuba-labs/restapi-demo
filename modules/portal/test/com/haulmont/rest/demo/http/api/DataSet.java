@@ -5,8 +5,6 @@
 
 package com.haulmont.rest.demo.http.api;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -198,8 +196,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_car where id = ?");
         try {
             for (UUID carId : carIds) {
-                Object param = new PostgresUUID(carId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, carId);
                 stmt.executeUpdate();
             }
 
@@ -213,8 +210,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_car_documentation where id = ?");
         try {
             for (UUID carDocumentationId : carDocumentationsIds) {
-                Object param = new PostgresUUID(carDocumentationId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, carDocumentationId);
                 stmt.executeUpdate();
             }
 
@@ -228,8 +224,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_car_token where id = ?");
         try {
             for (UUID carTokenId : carTokenIds) {
-                Object param = new PostgresUUID(carTokenId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, carTokenId);
                 stmt.executeUpdate();
             }
 
@@ -243,8 +238,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_colour where id = ?");
         try {
             for (UUID carId : colourIds) {
-                Object param = new PostgresUUID(carId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, carId);
                 stmt.executeUpdate();
             }
 
@@ -258,8 +252,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_driver where id = ?");
         try {
             for (UUID carId : driverIds) {
-                Object param = new PostgresUUID(carId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, carId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -272,8 +265,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from sec_user where id = ?");
         try {
             for (UUID userId : userIds) {
-                Object param = new PostgresUUID(userId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, userId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -286,8 +278,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from sec_role where id = ?");
         try {
             for (UUID roleId : roleIds) {
-                Object param = new PostgresUUID(roleId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, roleId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -300,8 +291,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from sec_permission where id = ?");
         try {
             for (UUID permissionId : permissionIds) {
-                Object param = new PostgresUUID(permissionId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, permissionId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -314,8 +304,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_model where id = ?");
         try {
             for (UUID modelId : modelIds) {
-                Object param = new PostgresUUID(modelId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, modelId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -328,8 +317,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_plant where id = ?");
         try {
             for (UUID plantId : plantIds) {
-                Object param = new PostgresUUID(plantId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, plantId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -342,8 +330,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_driver_alloc where id = ?");
         try {
             for (UUID driverAllocId : driverAllocIds) {
-                Object param = new PostgresUUID(driverAllocId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, driverAllocId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -356,8 +343,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_repair where id = ?");
         try {
             for (UUID repairId : repairIds) {
-                Object param = new PostgresUUID(repairId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, repairId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -370,8 +356,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_plant_model_link where plant_id = ?");
         try {
             for (UUID plantId : plantIds) {
-                Object param = new PostgresUUID(plantId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, plantId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -388,8 +373,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from sec_user_role where user_id = ?");
         try {
             for (UUID userId : userIds) {
-                Object param = new PostgresUUID(userId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, userId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -402,8 +386,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from ref_driver_group where id = ?");
         try {
             for (UUID driverGroupId : driverGroupIds) {
-                Object param = new PostgresUUID(driverGroupId);
-                stmt.setObject(1, param);
+                stmt.setObject(1, driverGroupId);
                 stmt.executeUpdate();
             }
         } finally {
@@ -429,8 +412,7 @@ public class DataSet {
         stmt = conn.prepareStatement("delete from " + tableName + " where id = ?");
         try {
             for (UUID uuid : ids) {
-                Object param = new PostgresUUID(uuid);
-                stmt.setObject(1, param);
+                stmt.setObject(1, uuid);
                 stmt.executeUpdate();
             }
         } finally {

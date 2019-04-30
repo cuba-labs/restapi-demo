@@ -7,7 +7,6 @@ package com.haulmont.rest.demo.http.rest;
 
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule;
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule;
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.cuba.security.entity.ConstraintCheckType;
 import com.haulmont.masquerade.Connectors;
 import com.haulmont.rest.demo.http.api.DataSet;
@@ -34,28 +33,23 @@ import static org.junit.Assert.*;
  */
 public class RowLevelSecurityFT {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost/refapp_6";
-
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static EncryptionModule encryption = new BCryptEncryptionModule();
     private Connection conn;
     private DataSet dirtyData = new DataSet();
-
     private UUID groupId;
     private UUID insuranceCaseConstraintId;
     private UUID modelConstraintId;
     private UUID userId;
-
     private UUID carId, newCarId;
     private UUID insuranceCase1Id;
     private UUID insuranceCase2Id;
-
     private UUID plantId;
     private UUID model1Id;
     private UUID model2Id;
-
     private String userPassword = "password";
     private String userLogin = "user1";
     private String userToken;
-    private static EncryptionModule encryption = new BCryptEncryptionModule();
 
     @Before
     public void setUp() throws Exception {
@@ -74,7 +68,7 @@ public class RowLevelSecurityFT {
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.requiresSecurityToken", "false");
         if (newCarId != null) {
-            executePrepared("delete from sec_entity_log where entity_id = ?", new PostgresUUID(newCarId));
+            executePrepared("delete from sec_entity_log where entity_id = ?", newCarId);
         }
         dirtyData.cleanup(conn);
         if (conn != null)
@@ -95,7 +89,7 @@ public class RowLevelSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select count(*) from REF_CAR where id = ? and delete_ts is null")) {
-            stmt.setObject(1, new PostgresUUID(newCarId));
+            stmt.setObject(1, newCarId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             int count = rs.getInt(1);
@@ -109,7 +103,7 @@ public class RowLevelSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select vin from REF_CAR where id = ? and delete_ts is null")) {
-            stmt.setObject(1, new PostgresUUID(newCarId));
+            stmt.setObject(1, newCarId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             assertEquals("vin123_1", rs.getString(1));
@@ -150,7 +144,7 @@ public class RowLevelSecurityFT {
 
         //the second element of insuranceCases collection must not be deleted
         try (PreparedStatement stmt = conn.prepareStatement("select count(*) from REF_INSURANCE_CASE where car_id = ? and delete_ts is null")) {
-            stmt.setObject(1, new PostgresUUID(carId));
+            stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             int count = rs.getInt(1);
@@ -245,7 +239,7 @@ public class RowLevelSecurityFT {
 
         //the second element of models collection must not be deleted
         try (PreparedStatement stmt = conn.prepareStatement("select count(*) from REF_PLANT_MODEL_LINK where plant_id = ?")) {
-            stmt.setObject(1, new PostgresUUID(plantId));
+            stmt.setObject(1, plantId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             int count = rs.getInt(1);
@@ -253,7 +247,7 @@ public class RowLevelSecurityFT {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select count (*) from REF_MODEL m join REF_PLANT_MODEL_LINK l on l.model_id = m.id where l.plant_id = ? and delete_ts is null")) {
-            stmt.setObject(1, new PostgresUUID(plantId));
+            stmt.setObject(1, plantId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             int count = rs.getInt(1);
@@ -263,13 +257,13 @@ public class RowLevelSecurityFT {
     }
 
     private void prepareDb() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        conn = DriverManager.getConnection(DB_URL, "root", "root");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        conn = DriverManager.getConnection(DB_URL, "sa", "");
 
         groupId = dirtyData.createGroupUuid();
         executePrepared("insert into sec_group(id, version, name) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(groupId),
+                groupId,
                 1l,
                 "Group"
         );
@@ -277,42 +271,42 @@ public class RowLevelSecurityFT {
         insuranceCaseConstraintId = dirtyData.createConstraintUuid();
         executePrepared("insert into sec_constraint(id, version, check_type, entity_name, groovy_script, group_id) " +
                         "values(?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(insuranceCaseConstraintId),
+                insuranceCaseConstraintId,
                 1l,
                 ConstraintCheckType.MEMORY.getId(),
                 "ref$InsuranceCase",
                 "{E}.description.startsWith('A')",
-                new PostgresUUID(groupId)
+                groupId
         );
 
         modelConstraintId = dirtyData.createConstraintUuid();
         executePrepared("insert into sec_constraint(id, version, check_type, entity_name, groovy_script, group_id) " +
                         "values(?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(modelConstraintId),
+                modelConstraintId,
                 1l,
                 ConstraintCheckType.MEMORY.getId(),
                 "ref$Model",
                 "{E}.name.startsWith('A')",
-                new PostgresUUID(groupId)
+                groupId
         );
 
         userId = dirtyData.createUserUuid();
         String pwd = encryption.getPasswordHash(userId, userPassword);
         executePrepared("insert into sec_user(id, version, login, password, password_encryption, group_id, login_lc) " +
                         "values(?, ?, ?, ?, ?, ?, ?)",
-                new PostgresUUID(userId),
+                userId,
                 1l,
                 userLogin,
                 pwd,
                 encryption.getHashMethod(),
-                new PostgresUUID(groupId),
+                groupId,
                 userLogin.toLowerCase()
         );
 
         carId = dirtyData.createCarUuid();
         executePrepared("insert into ref_car(id, version, vin) " +
                         "values(?, ?, ?)",
-                new PostgresUUID(carId),
+                carId,
                 1l,
                 "001"
         );
@@ -320,25 +314,25 @@ public class RowLevelSecurityFT {
         insuranceCase1Id = dirtyData.createInsuranceCaseUuid();
         executePrepared("insert into ref_insurance_case(id, version, description, car_id) " +
                         "values(?, ?, ?, ?)",
-                new PostgresUUID(insuranceCase1Id),
+                insuranceCase1Id,
                 1l,
                 "AAA",
-                new PostgresUUID(carId)
+                carId
         );
 
         insuranceCase2Id = dirtyData.createInsuranceCaseUuid();
         executePrepared("insert into ref_insurance_case(id, version, description, car_id) " +
                         "values(?, ?, ?, ?)",
-                new PostgresUUID(insuranceCase2Id),
+                insuranceCase2Id,
                 1l,
                 "BBB",
-                new PostgresUUID(carId)
+                carId
         );
 
         plantId = dirtyData.createPlantUuid();
         executePrepared("insert into ref_plant(id, version, name, dtype) " +
                         "values(?, ?, ?, ?)",
-                new PostgresUUID(plantId),
+                plantId,
                 1l,
                 "Plant1",
                 "ref$CustomExtPlant"
@@ -347,7 +341,7 @@ public class RowLevelSecurityFT {
         model1Id = dirtyData.createModelUuid();
         executePrepared("insert into ref_model(id, version, name, dtype) " +
                         "values(?, ?, ?, ?)",
-                new PostgresUUID(model1Id),
+                model1Id,
                 1l,
                 "AAA",
                 "ref$ExtModel"
@@ -356,7 +350,7 @@ public class RowLevelSecurityFT {
         model2Id = dirtyData.createModelUuid();
         executePrepared("insert into ref_model(id, version, name, dtype) " +
                         "values(?, ?, ?, ?)",
-                new PostgresUUID(model2Id),
+                model2Id,
                 1l,
                 "BBB",
                 "ref$ExtModel"
@@ -364,14 +358,14 @@ public class RowLevelSecurityFT {
 
         executePrepared("insert into ref_plant_model_link(plant_id, model_id) " +
                         "values(?, ?)",
-                new PostgresUUID(plantId),
-                new PostgresUUID(model1Id)
+                plantId,
+                model1Id
         );
 
         executePrepared("insert into ref_plant_model_link(plant_id, model_id) " +
                         "values(?, ?)",
-                new PostgresUUID(plantId),
-                new PostgresUUID(model2Id)
+                plantId,
+                model2Id
         );
     }
 

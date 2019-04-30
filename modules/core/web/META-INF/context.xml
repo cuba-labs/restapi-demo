@@ -9,12 +9,12 @@
             maxTotal="20"
             maxIdle="2"
             maxWaitMillis="5000"
-            driverClassName="org.postgresql.Driver"
-            username="root"
-            password="root"
-            url="jdbc:postgresql://localhost/refapp_6"
+            driverClassName="org.hsqldb.jdbc.JDBCDriver"
+            username="sa"
+            password=""
+            url="jdbc:hsqldb:hsql://localhost/rest_demo"
             cubaDbHost="localhost"
-            cubaDbName="refapp_6"/>
+            cubaDbName="rest_demo"/>
 
     <Resource
             name="jdbc/db1"
