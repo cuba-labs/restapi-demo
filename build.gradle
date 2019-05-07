@@ -128,9 +128,7 @@ configure(coreModule) {
         testCompile("httpunit:httpunit:1.7")
         testCompile("rhino:js:1.7R2")
 
-        jdbc('org.hsqldb:hsqldb:2.4.1')
-        testRuntime('org.hsqldb:hsqldb:2.4.1')
-
+        
         compile('org.apache.directory.server:apacheds-protocol-ldap:2.0.0.AM25')
         compile('org.apache.directory.server:apacheds-core-annotations:2.0.0.AM25')
         compile('org.apache.directory.server:apacheds-ldif-partition:2.0.0.AM25')

@@ -156,7 +156,7 @@ public class RowLevelSecurityFT {
             assertTrue(rs.next());
             String description = rs.getString("DESCRIPTION");
             String deletedBy = rs.getString("DELETED_BY");
-            UUID _carId = (UUID) rs.getObject("CAR_ID");
+            UUID _carId = UUID.fromString(rs.getString("CAR_ID"));
             assertEquals("AAA", description);
             assertNull(deletedBy);
             assertEquals(carId, _carId);
@@ -164,7 +164,7 @@ public class RowLevelSecurityFT {
             assertTrue(rs.next());
             description = rs.getString("DESCRIPTION");
             deletedBy = rs.getString("DELETED_BY");
-            _carId = (UUID) rs.getObject("CAR_ID");
+            _carId = UUID.fromString(rs.getString("CAR_ID"));
             assertEquals("BBB", description);
             assertNull(deletedBy);
             assertEquals(carId, _carId);

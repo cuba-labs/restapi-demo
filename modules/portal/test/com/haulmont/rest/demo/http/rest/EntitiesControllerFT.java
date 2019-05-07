@@ -556,7 +556,7 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    dirtyData.addRepairId((UUID) rs.getObject("ID"));
+                    dirtyData.addRepairId((UUID.fromString(rs.getString("ID"))));
                 }
             }
         }
@@ -568,7 +568,7 @@ public class EntitiesControllerFT {
             String vin = rs.getString("VIN");
             assertEquals("123", vin);
             Object modelId = rs.getObject("MODEL_ID");
-            assertEquals(UUID.fromString(modelUuidString), modelId);
+            assertEquals(modelUuidString, modelId);
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION, REPAIR_DATE from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
@@ -616,7 +616,7 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    UUID categoryAttrValueId = (UUID) rs.getObject("ID");
+                    UUID categoryAttrValueId = UUID.fromString(rs.getString("ID"));
                     dirtyData.addCategoryAttributeValueId(categoryAttrValueId);
                     String dynamicAttributeValue = rs.getString("STRING_VALUE");
                     assertEquals(numberOfSeats, dynamicAttributeValue);
@@ -827,7 +827,7 @@ public class EntitiesControllerFT {
             String vin = rs.getString("VIN");
             assertEquals("Modified vin", vin);
             Object modelId = rs.getObject("MODEL_ID");
-            assertEquals(UUID.fromString(model2UuidString), modelId);
+            assertEquals(model2UuidString, modelId);
         }
     }
 
@@ -869,7 +869,7 @@ public class EntitiesControllerFT {
                 String vin = rs.getString("VIN");
                 assertEquals("Modified vin", vin);
                 Object modelId = rs.getObject("MODEL_ID");
-                assertEquals(UUID.fromString(model2UuidString), modelId);
+                assertEquals(model2UuidString, modelId);
             }
         } finally {
             Connectors.jmx(WebConfigStorageJmxService.class)
@@ -943,7 +943,7 @@ public class EntitiesControllerFT {
             stmt.setObject(1, UUID.fromString(secondCarUuidString));
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
-            UUID attrValueId = (UUID) rs.getObject("ID");
+            UUID attrValueId = (UUID.fromString(rs.getString("ID")));
             dirtyData.addCategoryAttributeValueId(attrValueId);
             String value = rs.getString("STRING_VALUE");
             assertEquals(dynamicAttributeValue, value);
@@ -970,7 +970,7 @@ public class EntitiesControllerFT {
             Object modelId = rs.getObject("MODEL_ID");
             assertNull(modelId);
             Object colourId = rs.getObject("COLOUR_ID");
-            assertEquals(UUID.fromString(colourUuidString), colourId);
+            assertEquals(colourUuidString, colourId);
         }
     }
 
@@ -1044,7 +1044,7 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    dirtyData.addRepairId((UUID) rs.getObject("ID"));
+                    dirtyData.addRepairId(UUID.fromString(rs.getString("ID")));
                 }
             }
 
@@ -1052,23 +1052,21 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    dirtyData.addCarTokenId((UUID) rs.getObject("ID"));
+                    dirtyData.addCarTokenId(UUID.fromString(rs.getString("ID")));
                 }
             }
         }
 
-        UUID repair1Id;
         UUID repair2Id;
         try (PreparedStatement stmt = conn.prepareStatement("select ID, DESCRIPTION from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
             stmt.setObject(1, carId);
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next());
             String description1 = rs.getString("DESCRIPTION");
-            repair1Id = (UUID) rs.getObject("ID");
             assertEquals("Repair 1", description1);
             assertTrue(rs.next());
             String description2 = rs.getString("DESCRIPTION");
-            repair2Id = (UUID) rs.getObject("ID");
+            repair2Id = UUID.fromString(rs.getString("ID"));
             assertEquals("Repair 2", description2);
         }
 
@@ -1417,7 +1415,7 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, carId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    dirtyData.addRepairId((UUID) rs.getObject("ID"));
+                    dirtyData.addRepairId((UUID.fromString(rs.getString("ID"))));
                 }
             }
         }
@@ -1429,7 +1427,7 @@ public class EntitiesControllerFT {
             String vin = rs.getString("VIN");
             assertEquals("123", vin);
             Object modelId = rs.getObject("MODEL_ID");
-            assertEquals(UUID.fromString(modelUuidString), modelId);
+            assertEquals(modelUuidString, modelId);
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("select DESCRIPTION, REPAIR_DATE from REF_REPAIR where CAR_ID = ? order by DESCRIPTION")) {
@@ -1477,7 +1475,7 @@ public class EntitiesControllerFT {
             String vin = rs.getString("VIN");
             assertEquals("Modified vin", vin);
             Object modelId = rs.getObject("MODEL_ID");
-            assertEquals(UUID.fromString(model2UuidString), modelId);
+            assertEquals(model2UuidString, modelId);
         }
     }
 
