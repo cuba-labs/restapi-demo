@@ -3,9 +3,10 @@ package com.haulmont.rest.demo;
 import com.haulmont.rest.demo.core.app.PortalTestService;
 import org.junit.Test;
 
+import static com.haulmont.rest.demo.RestUtils.*;
 import static org.junit.Assert.assertNotNull;
 
-public class DeploymnetPortalTest extends RestUtils {
+public class DeploymnetPortalTest {
 
     protected static final String URI_BASE_PORTAL = "http://localhost:8080/app-portal/rest/v2";
 

@@ -624,18 +624,18 @@ public class ServicesControllerFT {
             ReadContext readContext = parseResponse(response);
             assertEquals(2, readContext.<Collection>read("$").size());
             Object firstServiceName = readContext.read("$.[0].name");
-            assertTrue("cuba_DynamicAttributesCacheService".equals(firstServiceName) || "refapp_PortalTestService".equals(firstServiceName));
+            assertTrue("cuba_DynamicAttributesCacheService".equals(firstServiceName) || "restdemo_PortalTestService".equals(firstServiceName));
             Object secondServiceName = readContext.read("$.[1].name");
-            assertTrue("cuba_DynamicAttributesCacheService".equals(secondServiceName) || "refapp_PortalTestService".equals(secondServiceName));
+            assertTrue("cuba_DynamicAttributesCacheService".equals(secondServiceName) || "restdemo_PortalTestService".equals(secondServiceName));
         }
     }
 
     @Test
     public void getServiceInfo() throws Exception {
-        try (CloseableHttpResponse response = sendGet("/services/refapp_PortalTestService", oauthToken, null)) {
+        try (CloseableHttpResponse response = sendGet("/services/restdemo_PortalTestService", oauthToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext readContext = parseResponse(response);
-            assertEquals("refapp_PortalTestService", readContext.read("$.name"));
+            assertEquals("restdemo_PortalTestService", readContext.read("$.name"));
             assertEquals(25, readContext.<Collection>read("$.methods").size());
             assertEquals(2, readContext.read("$.methods[?(@.name == 'sum')].params.length()", List.class).get(0));
 

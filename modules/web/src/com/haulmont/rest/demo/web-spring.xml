@@ -17,7 +17,7 @@
         <property name="serverSelector" ref="cuba_ServerSelector"/>
         <property name="remoteServices">
             <map>
-                <entry key="refapp_PortalTestService" value="com.haulmont.rest.demo.core.app.PortalTestService"/>
+                <entry key="restdemo_PortalTestService" value="com.haulmont.rest.demo.core.app.PortalTestService"/>
             </map>
         </property>
     </bean>

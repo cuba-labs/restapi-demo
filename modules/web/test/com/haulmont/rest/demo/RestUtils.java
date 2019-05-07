@@ -23,7 +23,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class RestUtils {
+public final class RestUtils {
 
     private static final String CLIENT_ID = "client";
     private static final String CLIENT_SECRET = "secret";
@@ -56,7 +56,7 @@ public class RestUtils {
         return JsonPath.parse(s);
     }
 
-    public String getAuthToken(String urlBase) throws Exception {
+    public static String getAuthToken(String urlBase) throws Exception {
         String uri = urlBase + "/oauth/token";
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -78,7 +78,7 @@ public class RestUtils {
         }
     }
 
-    public void loadSomeList(String url, String oauthToken) throws Exception {
+    public static void loadSomeList(String url, String oauthToken) throws Exception {
         try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
@@ -86,23 +86,23 @@ public class RestUtils {
         }
     }
 
-    public void executeQuery(String url, String oauthToken) throws Exception {
+    public static void executeQuery(String url, String oauthToken) throws Exception {
         Map<String, String> params = new HashMap<>();
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
-            assertEquals(MediaType.APPLICATION_JSON_UTF8_VALUE, responseContentType(response));
+            assertEquals("application/json;charset=utf-8", responseContentType(response));
             ReadContext ctx = parseResponse(response);
             assertEquals(1, ctx.<Collection>read("$").size());
             assertEquals("admin", ctx.read("$.[0].login"));
         }
     }
 
-    public void executeService(String url, String oauthToken) throws Exception {
+    public static void executeService(String url, String oauthToken) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("number1", "2");
         params.put("number2", "3");
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
-            assertEquals("text/plain;charset=UTF-8", responseContentType(response));
+            assertEquals("text/plain;charset=utf-8", responseContentType(response));
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             assertEquals("5", EntityUtils.toString(response.getEntity()));
         }

@@ -54,7 +54,7 @@ configure(coreModule) {
         dbPassword = 'root'
     }
 
-    task createDemoDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for com', type: CubaDbCreation) {
+    task createDemoDb(dependsOn: assembleDbScripts, description: 'Creates local Postgres database for demo', type: CubaDbCreation) {
         dbms = 'postgres'
         dbName = ('refapp_demo' + (demoToken != null ? '_' + demoToken : ''))
         dbUser = 'root'
@@ -117,8 +117,13 @@ configure(portalModule) {
 
 
 configure(webModule) {
-    task testStart(type: Test, dependsOn: testClasses) {
-        include("com/haulmont/rest/demo/DeploymentTest.class")
+    task testPortalStart(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/rest/demo/DeploymentPortalTest.class")
+        systemProperties = System.getProperties()
+    }
+
+    task testWebStart(type: Test, dependsOn: testClasses) {
+        include("com/haulmont/rest/demo/DeploymentWebTest.class")
         systemProperties = System.getProperties()
     }
 }

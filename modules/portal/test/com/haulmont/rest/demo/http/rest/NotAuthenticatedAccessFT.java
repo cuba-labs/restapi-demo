@@ -29,7 +29,7 @@ public class NotAuthenticatedAccessFT {
 
     @Test
     public void requestServicesController() throws Exception {
-        requestAndCheckUnauthorized("/services/refapp_PortalTestService/sum");
+        requestAndCheckUnauthorized("/services/restdemo_PortalTestService/sum");
     }
 
     @Test
