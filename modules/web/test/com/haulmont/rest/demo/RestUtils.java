@@ -90,7 +90,7 @@ public final class RestUtils {
         Map<String, String> params = new HashMap<>();
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
-            assertEquals("application/json;charset=utf-8", responseContentType(response));
+            assertEquals(MediaType.APPLICATION_JSON_UTF8_VALUE, responseContentType(response));
             ReadContext ctx = parseResponse(response);
             assertEquals(1, ctx.<Collection>read("$").size());
             assertEquals("admin", ctx.read("$.[0].login"));
@@ -102,7 +102,7 @@ public final class RestUtils {
         params.put("number1", "2");
         params.put("number2", "3");
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
-            assertEquals("text/plain;charset=utf-8", responseContentType(response));
+            assertEquals("text/plain;charset=UTF-8", responseContentType(response));
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             assertEquals("5", EntityUtils.toString(response.getEntity()));
         }
