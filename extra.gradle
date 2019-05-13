@@ -3,25 +3,34 @@
  * Use is subject to license terms, see http://www.cuba-platform.com/commercial-software-license for details.
  */
 buildscript {
+    ext.cubaVersion = '7.1-SNAPSHOT'
     repositories {
         mavenLocal()
-        jcenter()
+        if (System.getenv('HAULMONT_REPOSITORY_URL')) {
+            maven {
+                credentials {
+                    username System.getenv('HAULMONT_REPOSITORY_USER')
+                    password System.getenv('HAULMONT_REPOSITORY_PASSWORD')
+                }
+                url System.getenv('HAULMONT_REPOSITORY_URL')
+            }
+        } else {
+            jcenter()
 
-        /*
-         * maven { url "https://dl.bintray.com/cuba-platform/main" }
-         *
-         * TODO: temprorary - use Bintray later
-         */
-        maven {
-            url 'https://repo.cuba-platform.com/content/groups/work'
-            credentials {
-                username 'cuba'
-                password 'cuba123'
+            /*maven { url "https://dl.bintray.com/cuba-platform/main" }*/
+
+            maven {
+                url 'https://repo.cuba-platform.com/content/groups/work'
+                credentials {
+                    username 'cuba'
+                    password 'cuba123'
+                }
             }
         }
     }
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+        classpath "com.haulmont.gradle:addon-gradle-plugin:1.0.3"
     }
 }
 
