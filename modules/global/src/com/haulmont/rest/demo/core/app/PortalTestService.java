@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 public interface PortalTestService {
 
-    String NAME = "refapp_PortalTestService";
+    String NAME = "restdemo_PortalTestService";
 
     void emptyMethod();
 

@@ -177,6 +177,7 @@ configure(webModule) {
         compileOnly(servletApi)
         compile(globalModule)
 
+        testCompile('com.jayway.jsonpath:json-path:2.4.0')
         testCompile('com.haulmont.masquerade:masquerade-connector:1.0.7')
         testCompile('com.haulmont.masquerade:masquerade-web:1.0.7')
         

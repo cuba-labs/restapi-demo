@@ -9,19 +9,31 @@
         <method name="loadCache"/>
     </service>
 
-    <service name="refapp_PortalTestService">
+    <service name="restdemo_PortalTestService">
         <method name="sum"/>
+
         <method name="emptyMethod"/>
+
         <method name="overloadedMethod"/>
+
         <method name="nonExistingMethod"/>
+
         <method name="findCar"/>
+
         <method name="findAllCars"/>
+
         <method name="updateCarVin"/>
+
         <method name="updateCarVins"/>
+
         <method name="testDateParam"/>
+
         <method name="testBigDecimalParam"/>
+
         <method name="getPojo"/>
+
         <method name="methodWithPojoParameter"/>
+
         <method name="notPersistedEntity"/>
     </service>
 </services>
