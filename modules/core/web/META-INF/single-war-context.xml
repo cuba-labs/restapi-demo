@@ -5,7 +5,7 @@
 
 <Context>
 
-    <!-- PostgreSQL connection -->
+    <!-- HSQLDB connection -->
     <Resource
             name="jdbc/CubaDS"
             type="javax.sql.DataSource"
@@ -13,8 +13,8 @@
             maxIdle="2"
             maxWaitMillis="5000"
             driverClassName="org.hsqldb.jdbc.JDBCDriver"
-            username="root"
-            password="root"
+            username="sa"
+            password=""
             url="jdbc:hsqldb:hsql://localhost/rest_demo"/>
 
     <Resource
