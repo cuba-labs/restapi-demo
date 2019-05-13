@@ -7,10 +7,10 @@ package com.haulmont.rest.demo.http.rest.transform;
 
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Scripting;
-import com.haulmont.addon.restapi.config.RestJsonTransformations;
-import com.haulmont.addon.restapi.transform.AbstractEntityJsonTransformer;
-import com.haulmont.addon.restapi.transform.StandardEntityJsonTransformer;
-import com.haulmont.addon.restapi.transform.JsonTransformationDirection;
+import com.haulmont.addon.restapi.api.config.RestJsonTransformations;
+import com.haulmont.addon.restapi.api.transform.AbstractEntityJsonTransformer;
+import com.haulmont.addon.restapi.api.transform.StandardEntityJsonTransformer;
+import com.haulmont.addon.restapi.api.transform.JsonTransformationDirection;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
