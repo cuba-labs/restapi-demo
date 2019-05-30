@@ -1,6 +1,7 @@
 package com.haulmont.rest.demo;
 
 import com.haulmont.rest.demo.core.app.PortalTestService;
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.haulmont.rest.demo.RestUtils.*;
@@ -10,9 +11,15 @@ public class DeploymentPortalTest {
 
     protected static final String URI_BASE_PORTAL = "http://localhost:8080/app-portal/rest/v2";
 
+    protected String oauthTokenPortal;
+
+    @Before
+    public void beforeEach() throws Exception {
+        oauthTokenPortal = getAuthToken(URI_BASE_PORTAL);
+    }
+
     @Test
-    public void getTokenPortal() throws Exception {
-        String oauthTokenPortal = getAuthToken(URI_BASE_PORTAL);
+    public void getTokenPortal(){
         assertNotNull(oauthTokenPortal);
     }
 
