@@ -6,7 +6,7 @@ import org.junit.Test;
 import static com.haulmont.rest.demo.RestUtils.*;
 import static org.junit.Assert.assertNotNull;
 
-public class DeploymnetPortalTest {
+public class DeploymentPortalTest {
 
     protected static final String URI_BASE_PORTAL = "http://localhost:8080/app-portal/rest/v2";
 
