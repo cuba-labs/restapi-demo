@@ -1,4 +1,3 @@
-
 buildscript {
     ext.cubaVersion = '7.2-SNAPSHOT'
     repositories {
@@ -74,10 +73,9 @@ configure([globalModule, coreModule, webModule, portalModule]) {
         testCompile('org.jmockit:jmockit:1.39')
         testCompile('junit:junit:4.12')
         testCompile('org.spockframework:spock-core:1.2-groovy-2.5')
-        
 
         // New http client needed for running selenium tests
-        testCompile('org.apache.httpcomponents:httpcore:4.4.10'){
+        testCompile('org.apache.httpcomponents:httpcore:4.4.10') {
             exclude(group: 'org.codehaus.groovy', module: 'groovy-all')
         }
     }
@@ -88,7 +86,7 @@ configure([globalModule, coreModule, webModule, portalModule]) {
                 include 'spec/**'
                 srcDir 'test'
             }
-            java{
+            java {
                 srcDir 'test'
             }
         }
@@ -128,7 +126,6 @@ configure(coreModule) {
         testCompile("httpunit:httpunit:1.7")
         testCompile("rhino:js:1.7R2")
 
-        
         compile('org.apache.directory.server:apacheds-protocol-ldap:2.0.0.AM25')
         compile('org.apache.directory.server:apacheds-core-annotations:2.0.0.AM25')
         compile('org.apache.directory.server:apacheds-ldif-partition:2.0.0.AM25')
@@ -180,7 +177,7 @@ configure(webModule) {
         testCompile('com.jayway.jsonpath:json-path:2.4.0')
         testCompile('com.haulmont.masquerade:masquerade-connector:1.0.7')
         testCompile('com.haulmont.masquerade:masquerade-web:1.0.7')
-        
+
         testCompile('junit:junit:4.12')
     }
 
@@ -219,6 +216,16 @@ configure(webModule) {
     task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
         appName = "${modulePrefix}"
         appJars(modulePrefix + '-global', modulePrefix + '-web')
+    }
+
+    task testPortalStart(type: Test, dependsOn: testClasses) {
+        include("**/DeploymentPortalTest.class")
+        systemProperties = System.getProperties()
+    }
+
+    task testWebStart(type: Test, dependsOn: testClasses) {
+        include("**/DeploymentWebTest.class")
+        systemProperties = System.getProperties()
     }
 }
 
@@ -283,6 +290,12 @@ configure(portalModule) {
         classifier = 'web'
     }
 
+    task funcTest(dependsOn: ':prepareTest', description: 'Run functional tests', type: Test) {
+        scanForTestClasses = false
+        includes = ['**/*FT.class']
+        workingDir = "$projectDir/../../"
+    }
+
     artifacts {
         archives webArchive
     }
@@ -306,4 +319,138 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
     }
 }
 
-apply from: 'extra.gradle'
+/* ============= REST API testing =============== */
+
+task clearConf(description: 'Clears conf directory') {
+    doLast {
+        def dir = new File(cuba.tomcat.dir, '/conf/app')
+        if (dir.isDirectory()) {
+            ant.delete(includeemptydirs: true) {
+                fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+            }
+        }
+    }
+}
+
+task stopTomcatAfterTest(type: CubaStopTomcat, description: 'Stops Tomcat after functional tests') {
+    tomcatRootDir = cuba.tomcat.dir
+}
+
+task enableRemoteJmx() {
+    doLast {
+        project.file("${cuba.tomcat.dir}/bin/setenv.bat").text = '''
+set CATALINA_OPTS=-Xmx512m -Dfile.encoding=UTF-8
+
+set CATALINA_OPTS=%CATALINA_OPTS% -Dlogback.configurationFile=../conf/logback.xml
+
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote 
+set CATALINA_OPTS=%CATALINA_OPTS% -Djava.rmi.server.hostname=localhost 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.port=7777 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.ssl=false 
+set CATALINA_OPTS=%CATALINA_OPTS% -Dcom.sun.management.jmxremote.authenticate=false
+
+set JPDA_OPTS=-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n
+'''
+
+        project.file("${cuba.tomcat.dir}/bin/setenv.sh").text = '''
+CATALINA_OPTS="-Xmx512m -Dfile.encoding=UTF-8"
+
+CATALINA_OPTS="$CATALINA_OPTS -Dlogback.configurationFile=../conf/logback.xml"
+
+CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote"
+
+CATALINA_OPTS="$CATALINA_OPTS \\
+-Djava.rmi.server.hostname=localhost \\
+-Dcom.sun.management.jmxremote.port=7777 \\
+-Dcom.sun.management.jmxremote.ssl=false \\
+-Dcom.sun.management.jmxremote.authenticate=false"
+
+JPDA_OPTS="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+'''
+    }
+}
+
+task enableTestProperties() {
+    doLast {
+        project.file("${cuba.tomcat.dir}/conf/app-core/").mkdirs()
+        project.file("${cuba.tomcat.dir}/conf/app-core/local.app.properties").text = '''
+refapp.core.embeddedLdap.startTcpServer = true
+'''
+        project.file("${cuba.tomcat.dir}/conf/app-portal/").mkdirs()
+        project.file("${cuba.tomcat.dir}/conf/app-portal/local.app.properties").text = '''
+cuba.rest.ldap.enabled = true
+cuba.rest.ldap.urls = ldap://localhost:10389
+cuba.rest.ldap.base = dc=example,dc=com
+cuba.rest.ldap.user = cn=refapp,dc=example,dc=com
+cuba.rest.ldap.password = refapp
+cuba.rest.ldap.userLoginField = cn
+'''
+    }
+}
+
+task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble],
+        description: 'Prepare server for tests') {
+    doLast {
+        // Setup
+        setupTomcat.execute()
+
+        // Test configuration
+        enableTestProperties.execute()
+        enableRemoteJmx.execute()
+
+        // Deploy
+        coreModule.deploy.execute()
+        webModule.deploy.execute()
+        portalModule.deploy.execute()
+        // Create DB
+        coreModule.createDb.execute()
+        // Start server
+        start.execute()
+
+        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            http(url: "http://localhost:8080/app")
+        }
+        // Delete out directory
+        File dir = new File("$projectDir/tests/ui/out")
+        if (dir.exists()) {
+            project.delete(dir)
+        }
+    }
+}
+
+/* ============= Deployment Testing =============== */
+
+task buildWar(type: CubaWarBuilding) {
+    appHome = '${catalina.base}/work/app_home'
+    singleWar = false
+    includeJdbcDriver = true
+    includeContextXml = true
+}
+
+task buildSingleWar(type: CubaWarBuilding) {
+    appHome = '${catalina.base}/work/app_home'
+    webXml = "${project(':app-web').projectDir}/web/WEB-INF/single-app-web.xml"
+    coreContextXmlPath = 'modules/core/web/META-INF/single-war-context.xml'
+    includeJdbcDriver = true
+    includeContextXml = true
+}
+
+task buildUberJar(type: CubaUberJarBuilding) {
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    appProperties = ['cuba.automaticDatabaseUpdate': true]
+    appName = 'app'
+    logbackConfigurationFile = "test-deployment/logback.xml"
+}
+
+task buildSingleUberJar(type: CubaUberJarBuilding) {
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    appProperties = ['cuba.automaticDatabaseUpdate': true]
+    singleJar = true
+    logbackConfigurationFile = "test-deployment/logback.xml"
+}
+
+task copyWarToTomcat(type: Copy) {
+    from "${project.buildDir}/distributions/war"
+    include "*.war"
+    into "${cuba.tomcat.dir}/webapps"
+}
