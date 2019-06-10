@@ -332,10 +332,6 @@ task clearConf(description: 'Clears conf directory') {
     }
 }
 
-task stopTomcatAfterTest(type: CubaStopTomcat, description: 'Stops Tomcat after functional tests') {
-    tomcatRootDir = cuba.tomcat.dir
-}
-
 task enableRemoteJmx() {
     doLast {
         project.file("${cuba.tomcat.dir}/bin/setenv.bat").text = '''
@@ -388,33 +384,25 @@ cuba.rest.ldap.userLoginField = cn
     }
 }
 
-task prepareTest(dependsOn: [dropTomcat, coreModule.assemble, webModule.assemble, portalModule.assemble],
+task prepareTest(dependsOn: [dropTomcat, coreModule.createDb, coreModule.assemble, webModule.assemble, portalModule.assemble],
         description: 'Prepare server for tests') {
-    doLast {
-        // Setup
-        setupTomcat.execute()
+    Task setupTomcat = tasks.findByName('setupTomcat')
 
-        // Test configuration
-        enableTestProperties.execute()
-        enableRemoteJmx.execute()
+    dependsOn setupTomcat
+    dependsOn enableTestProperties, enableRemoteJmx
+    dependsOn coreModule.deploy, webModule.deploy, portalModule.deploy
 
-        // Deploy
-        coreModule.deploy.execute()
-        webModule.deploy.execute()
-        portalModule.deploy.execute()
-        // Create DB
-        coreModule.createDb.execute()
-        // Start server
-        start.execute()
+    coreModule.deploy.mustRunAfter(setupTomcat)
+    webModule.deploy.mustRunAfter(setupTomcat)
+    portalModule.deploy.mustRunAfter(setupTomcat)
+    
+    enableTestProperties.mustRunAfter(setupTomcat)
+    enableRemoteJmx.mustRunAfter(setupTomcat)
 
-        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
-            http(url: "http://localhost:8080/app")
-        }
-        // Delete out directory
-        File dir = new File("$projectDir/tests/ui/out")
-        if (dir.exists()) {
-            project.delete(dir)
-        }
+    finalizedBy 'start'
+
+    ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+        http(url: "http://localhost:8080/app")
     }
 }
 
