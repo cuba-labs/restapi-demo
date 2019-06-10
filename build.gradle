@@ -386,7 +386,6 @@ cuba.rest.ldap.userLoginField = cn
 
 task prepareTest(dependsOn: [dropTomcat, coreModule.createDb, coreModule.assemble, webModule.assemble, portalModule.assemble],
         description: 'Prepare server for tests') {
-    Task setupTomcat = tasks.findByName('setupTomcat')
 
     dependsOn setupTomcat
     dependsOn enableTestProperties, enableRemoteJmx
@@ -395,11 +394,11 @@ task prepareTest(dependsOn: [dropTomcat, coreModule.createDb, coreModule.assembl
     coreModule.deploy.mustRunAfter(setupTomcat)
     webModule.deploy.mustRunAfter(setupTomcat)
     portalModule.deploy.mustRunAfter(setupTomcat)
-    
+
     enableTestProperties.mustRunAfter(setupTomcat)
     enableRemoteJmx.mustRunAfter(setupTomcat)
 
-    finalizedBy 'start'
+    finalizedBy start
 
     ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
         http(url: "http://localhost:8080/app")
