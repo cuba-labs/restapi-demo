@@ -119,6 +119,48 @@ public class FilesControllerFT extends AbstractRestControllerFT {
     }
 
     @Test
+    public void uploadFileWithId() throws Exception {
+        URIBuilder uriBuilder = new URIBuilder(URI_BASE + "/files");
+
+        String fileName = "fileToUpload.txt";
+        String id = UUID.randomUUID().toString();
+
+        uriBuilder.addParameter("name", fileName);
+        uriBuilder.addParameter("id", id);
+        URL fileUrl = FilesControllerFT.class.getResource("data/" + fileName);
+
+        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(new File(fileUrl.toURI())));
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(uriBuilder.build());
+        httpPost.setEntity(entity);
+        httpPost.setHeader("Authorization", "Bearer " + oauthToken);
+        httpPost.setHeader("Content-Type", "text/plain");
+        try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+            assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+            ReadContext ctx = RestTestUtils.parseResponse(response);
+
+            assertEquals(fileName, ctx.read("$.name"));
+            String fileDescriptorId = ctx.read("$.id");
+            assertEquals(id, fileDescriptorId);
+            assertEquals(0, (int) ctx.read("$.size"));
+
+            Header location = response.getFirstHeader("Location");
+            assertEquals(URI_BASE + "/files/" + id, location.getValue());
+
+            try (PreparedStatement stmt = conn.prepareStatement("select NAME, EXT, FILE_SIZE from SYS_FILE where ID = ?")) {
+                stmt.setObject(1, UUID.fromString(fileDescriptorId));
+                ResultSet rs = stmt.executeQuery();
+                assertTrue(rs.next());
+                assertEquals(fileName, rs.getString("NAME"));
+                assertEquals("txt", rs.getString("EXT"));
+                assertEquals(0, rs.getLong("FILE_SIZE"));
+                assertFalse(rs.next());
+            }
+        }
+    }
+
+    @Test
     public void downloadFile() throws Exception {
         String fileId = _uploadFile("test-file.pdf");
         CloseableHttpClient httpClient = HttpClients.createDefault();
