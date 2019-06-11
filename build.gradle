@@ -384,25 +384,15 @@ cuba.rest.ldap.userLoginField = cn
     }
 }
 
-task prepareTest(dependsOn: [dropTomcat, coreModule.createDb, coreModule.assemble, webModule.assemble, portalModule.assemble],
-        description: 'Prepare server for tests') {
+task configureTest(dependsOn: [enableTestProperties, enableRemoteJmx])
 
-    dependsOn setupTomcat
-    dependsOn enableTestProperties, enableRemoteJmx
-    dependsOn coreModule.deploy, webModule.deploy, portalModule.deploy
+task deployTest(dependsOn: [coreModule.deploy, webModule.deploy, portalModule.deploy])
 
-    coreModule.deploy.mustRunAfter(setupTomcat)
-    webModule.deploy.mustRunAfter(setupTomcat)
-    portalModule.deploy.mustRunAfter(setupTomcat)
+task prepareTest(dependsOn: [dropTomcat, setupTomcat, coreModule.createDb, coreModule.assemble, webModule.assemble, portalModule.assemble, configureTest, deployTest, start], description: 'Prepare server for tests')
 
-    enableTestProperties.mustRunAfter(setupTomcat)
-    enableRemoteJmx.mustRunAfter(setupTomcat)
-
-    finalizedBy start
-
-    ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
-        http(url: "http://localhost:8080/app")
-    }
+configureTest.mustRunAfter setupTomcat {
+    deployTest.mustRunAfter setupTomcat
+    start.mustRunAfter enableTestProperties, enableRemoteJmx
 }
 
 /* ============= Deployment Testing =============== */
