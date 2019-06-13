@@ -386,14 +386,13 @@ cuba.rest.ldap.userLoginField = cn
 
 task configureTest(dependsOn: [enableTestProperties, enableRemoteJmx])
 
-task deployTest(dependsOn: [coreModule.deploy, webModule.deploy, portalModule.deploy])
+task prepareTest(dependsOn: [dropTomcat, setupTomcat,
+                             coreModule.createDb, configureTest, 
+                             coreModule.deploy, webModule.deploy, portalModule.deploy, start],
+        description: 'Prepare server for tests')
 
-task prepareTest(dependsOn: [dropTomcat, setupTomcat, coreModule.createDb, coreModule.assemble, webModule.assemble, portalModule.assemble, configureTest, deployTest, start], description: 'Prepare server for tests')
-
-configureTest.mustRunAfter setupTomcat {
-    deployTest.mustRunAfter setupTomcat
-    start.mustRunAfter configureTest
-}
+configureTest.mustRunAfter setupTomcat
+start.mustRunAfter configureTest
 
 /* ============= Deployment Testing =============== */
 
