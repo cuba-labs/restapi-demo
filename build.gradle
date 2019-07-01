@@ -248,6 +248,12 @@ configure(portalModule) {
         testCompile("rhino:js:1.7R2")
     }
 
+    afterEvaluate {
+        test {
+            jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
+        }
+    }
+
     def webappName = "${modulePrefix}-portal"
     def resourcesDir = "$cuba.tomcat.dir/webapps/$webappName/resources"
     def ftlDir = "$cuba.tomcat.dir/webapps/$webappName/WEB-INF/templates"
