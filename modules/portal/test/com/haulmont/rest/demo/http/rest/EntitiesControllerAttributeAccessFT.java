@@ -94,7 +94,10 @@ public class EntitiesControllerAttributeAccessFT {
         UUID driverId;
         String url = "/entities/ref$Driver/";
 
-        try (CloseableHttpResponse response = sendPost(url, driverReadUserToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView","driverWithVersionAndCreateTs");
+
+        try (CloseableHttpResponse response = sendPost(url, driverReadUserToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
@@ -151,6 +154,9 @@ public class EntitiesControllerAttributeAccessFT {
     public void updateDriverNameNotPermitted() throws Exception {
         String securityToken;
         String url = "/entities/ref$Driver/" + driver1UuidString;
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "driverWithStatusAndName");
+
         try (CloseableHttpResponse response = sendGet(url, driverReadUserToken, null)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
@@ -164,8 +170,9 @@ public class EntitiesControllerAttributeAccessFT {
         Map<String, String> replacements = new HashMap<>();
         replacements.put("$DRIVER_ID$", driver1UuidString);
         replacements.put("$SECURITY_TOKEN$", securityToken);
+
         String json = getFileContent("attributeAccess_updateDriverNameForbidden.json", replacements);
-        try (CloseableHttpResponse response = sendPut(url, driverReadUserToken, json, null)) {
+        try (CloseableHttpResponse response = sendPut(url, driverReadUserToken, json, params)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
 
@@ -202,8 +209,12 @@ public class EntitiesControllerAttributeAccessFT {
             Map<String, String> replacements = new HashMap<>();
             replacements.put("$DRIVER_ID$", driver1UuidString);
             replacements.put("$SECURITY_TOKEN$", securityToken);
+
+            Map<String, String> params = new HashMap<>();
+            params.put("responseView", "driverWithStatusAndName");
+
             String json = getFileContent("attributeAccess_updateDriverNameForbidden.json", replacements);
-            try (CloseableHttpResponse response = sendPut(url, driverReadUserToken, json, null)) {
+            try (CloseableHttpResponse response = sendPut(url, driverReadUserToken, json, params)) {
                 assertEquals(HttpStatus.SC_OK, statusCode(response));
                 ReadContext ctx = parseResponse(response);
 

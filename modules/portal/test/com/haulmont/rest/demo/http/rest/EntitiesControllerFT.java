@@ -533,7 +533,10 @@ public class EntitiesControllerFT {
         UUID carId;
         String url = "/entities/ref_Car";
 
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "carWithTransform");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
@@ -545,8 +548,7 @@ public class EntitiesControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("ref_Car", ctx.read("$._entityName"));
             assertEquals(carId.toString(), ctx.read("$.id"));
-            assertEquals(carId.toString(), ctx.read("$.id"));
-            assertTrue(ctx.read("$.repairs.length()", Integer.class) == 2);
+            assertEquals(2, (int) ctx.read("$.repairs.length()"));
             assertNotNull(ctx.read("$.createTs"));
             assertNotNull(ctx.read("$.version"));
 
@@ -633,7 +635,10 @@ public class EntitiesControllerFT {
         String url = "/entities/ref$Currency";
 
         String currencyId;
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "currencyWithCodeAndName");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
@@ -658,6 +663,71 @@ public class EntitiesControllerFT {
             assertTrue(rs.next());
             String name = rs.getString("NAME");
             assertEquals("Ruble", name);
+        }
+    }
+
+    @Test
+    public void createNewEntityWithoutResponseView() throws Exception {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("$MODEL_ID$", model3UuidString);
+        String json = getFileContent("carWithModel.json", replacements);
+
+        UUID carId;
+        String url = "/entities/ref_Car";
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+            assertEquals(HttpStatus.SC_CREATED, statusCode(response));
+            Header[] locationHeaders = response.getHeaders("Location");
+            assertEquals(1, locationHeaders.length);
+            String location = locationHeaders[0].getValue();
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
+            String idString = location.substring(location.lastIndexOf("/") + 1);
+            carId = UUID.fromString(idString);
+
+            ReadContext ctx = parseResponse(response);
+
+            assertEquals(3, (int) ctx.read("$.length()"));
+            assertEquals(carId.toString(), ctx.read("$.id"));
+            assertEquals("123", ctx.read("$._instanceName"));
+            assertEquals("ref_Car", ctx.read("$._entityName"));
+
+            //to delete the created objects in the @After method
+            dirtyData.addCarId(carId);
+        }
+    }
+
+    @Test
+    public void createNewEntityWithResponseView() throws Exception {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("$MODEL_ID$", model3UuidString);
+
+        String json = getFileContent("carWithModel.json", replacements);
+
+        UUID carId;
+        String url = "/entities/ref_Car";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "_local");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
+            assertEquals(HttpStatus.SC_CREATED, statusCode(response));
+            Header[] locationHeaders = response.getHeaders("Location");
+            assertEquals(1, locationHeaders.length);
+            String location = locationHeaders[0].getValue();
+            assertTrue(location.startsWith("http://localhost:8080/app/rest/v2/entities/ref_Car"));
+            String idString = location.substring(location.lastIndexOf("/") + 1);
+            carId = UUID.fromString(idString);
+
+            ReadContext ctx = parseResponse(response);
+
+            assertEquals(4, (int) ctx.read("$.length()"));
+            assertEquals(carId.toString(), ctx.read("$.id"));
+            assertEquals("123", ctx.read("$._instanceName"));
+            assertEquals("ref_Car", ctx.read("$._entityName"));
+            assertEquals("123", ctx.read("$.vin"));
+
+            //to delete the created objects in the @After method
+            dirtyData.addCarId(carId);
         }
     }
 
@@ -711,7 +781,11 @@ public class EntitiesControllerFT {
     public void createEntityWithEnum() throws Exception {
         String json = getFileContent("createEntityWithEnum.json", null);
         String url = "/entities/ref$Driver";
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "driverWithStatusAndName");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             ReadContext ctx = parseResponse(response);
 
@@ -728,10 +802,8 @@ public class EntitiesControllerFT {
                 stmt.setObject(1, driverId);
                 ResultSet rs = stmt.executeQuery();
                 assertTrue(rs.next());
-                String name = rs.getString("NAME");
-                assertEquals("John Smith", name);
-                Integer status = rs.getInt("STATUS");
-                assertEquals(10, (int) status);
+                assertEquals("John Smith", rs.getString("NAME"));
+                assertEquals(10, rs.getInt("STATUS"));
             }
         }
     }
@@ -743,7 +815,11 @@ public class EntitiesControllerFT {
 
         String json = getFileContent("createEntityWithTransientProperty.json", replacements);
         String url = "/entities/debt$Case";
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "caseWithTransientProperty");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             ReadContext ctx = parseResponse(response);
 
@@ -774,7 +850,10 @@ public class EntitiesControllerFT {
         UUID customerId;
         String url = "/entities/ref$Mem1Customer";
 
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "mem1CustomerWithName");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
@@ -808,7 +887,11 @@ public class EntitiesControllerFT {
         String json = getFileContent("updateCar.json", replacements);
 
         String url = "/entities/ref_Car/" + carUuidString;
-        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, null)) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "carWithModel");
+
+        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
 
             ReadContext ctx = parseResponse(response);
@@ -842,7 +925,10 @@ public class EntitiesControllerFT {
             String json = getFileContent("updateCar.json", replacements);
 
             String url = "/entities/ref_Car/" + carUuidString;
-            try (CloseableHttpResponse response = sendPut(url, oauthToken, json, null)) {
+            Map<String, String> params = new HashMap<>();
+            params.put("responseView", "carWithModel");
+
+            try (CloseableHttpResponse response = sendPut(url, oauthToken, json, params)) {
                 assertEquals(HttpStatus.SC_OK, statusCode(response));
 
                 ReadContext ctx = parseResponse(response);
@@ -1021,7 +1107,10 @@ public class EntitiesControllerFT {
         UUID carId;
         String url = "/entities/ref_Car";
 
-        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "carWithTwoLevelComposition");
+
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
             Header[] locationHeaders = response.getHeaders("Location");
             assertEquals(1, locationHeaders.length);
@@ -1033,8 +1122,7 @@ public class EntitiesControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("ref_Car", ctx.read("$._entityName"));
             assertEquals(carId.toString(), ctx.read("$.id"));
-            assertEquals(carId.toString(), ctx.read("$.id"));
-            assertTrue(ctx.read("$.repairs.length()", Integer.class) == 2);
+            assertEquals(2, (int) ctx.read("$.repairs.length()"));
             assertNotNull(ctx.read("$.createTs"));
             assertNotNull(ctx.read("$.version"));
 
@@ -1278,7 +1366,10 @@ public class EntitiesControllerFT {
 
         url = "/entities/ref$IdentityCustomer/" + customerId;
         json = getFileContent("updateBaseDbGeneratedIdEntity.json", replacements);
-        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "identityCustomerWithName");
+
+        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
             assertEquals("John", ctx.read("$.name"));
@@ -1390,6 +1481,7 @@ public class EntitiesControllerFT {
 
         Map<String, String> params = new HashMap<>();
         params.put("modelVersion", "1.0");
+        params.put("responseView", "carWithTransform");
 
         try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
@@ -1404,7 +1496,7 @@ public class EntitiesControllerFT {
             assertEquals("ref$OldCar", ctx.read("$._entityName"));
             assertEquals(carId.toString(), ctx.read("$.id"));
             assertEquals("123", ctx.read("$.oldVin"));
-            assertTrue(ctx.read("$.repairs.length()", Integer.class) == 2);
+            assertEquals(2, (int) ctx.read("$.repairs.length()"));
             assertNotNull(ctx.read("$.createTs"));
             assertNotNull(ctx.read("$.version"));
             assertNotNull(ctx.read("$.model"));
@@ -1452,8 +1544,10 @@ public class EntitiesControllerFT {
         replacements.put("$CAR_ID$", carUuidString);
         replacements.put("$MODEL_ID$", model2UuidString);
         String json = getFileContent("updateOldCar.json", replacements);
+
         Map<String, String> params = new HashMap<>();
         params.put("modelVersion", "1.0");
+        params.put("responseView", "carWithTransform");
 
         String url = "/entities/ref$OldCar/" + carUuidString;
         try (CloseableHttpResponse response = sendPut(url, oauthToken, json, params)) {
@@ -1529,6 +1623,7 @@ public class EntitiesControllerFT {
 
         Map<String, String> params = new HashMap<>();
         params.put("modelVersion", "1.0");
+        params.put("responseView", "repairWithDescription");
 
         try (CloseableHttpResponse response = sendPost(url, oauthToken, json, params)) {
             assertEquals(HttpStatus.SC_CREATED, statusCode(response));
