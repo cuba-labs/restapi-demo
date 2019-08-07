@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.haulmont.rest.demo.http.rest.RestTestUtils.*;
@@ -100,7 +102,10 @@ public class BeanValidationFT extends AbstractRestControllerFT {
         String json = getFileContent("currency-missing-name.json", null);
         String url = "/entities/ref$Currency/" + currencyCode;
 
-        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, null)) {
+        Map<String, String> params = new HashMap<>();
+        params.put("responseView", "currencyWithName");
+
+        try (CloseableHttpResponse response = sendPut(url, oauthToken, json, params)) {
 
             assertEquals(HttpStatus.SC_OK, statusCode(response));
             ReadContext ctx = parseResponse(response);
