@@ -320,6 +320,22 @@ public class EntitiesControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("Colour 5", ctx.read("$.[0].name"));
         }
+
+        params.put("sort", "description, -name");
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals("Description 1", ctx.read("$.[0].description"));
+            assertEquals("Colour 3", ctx.read("$.[0].name"));
+        }
+
+        params.put("sort", "-description, +name");
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals("Description 2", ctx.read("$.[0].description"));
+            assertEquals("Colour 4", ctx.read("$.[0].name"));
+        }
     }
 
     @Test
@@ -1664,9 +1680,10 @@ public class EntitiesControllerFT {
     private void prepareDb() throws Exception {
         UUID colourId = dirtyData.createColourUuid();
         colourUuidString = colourId.toString();
-        executePrepared("insert into ref_colour(id, name, version) values (?, ?, 1)",
+        executePrepared("insert into ref_colour(id, name, description, version) values (?, ?, ?, 1)",
                 colourId,
-                "Colour 1");
+                "Colour 1",
+                "Description 1");
 
         UUID modelId = dirtyData.createModelUuid();
         modelUuidString = modelId.toString();
@@ -1729,9 +1746,10 @@ public class EntitiesControllerFT {
 
         for (int i = 2; i < 6; i++) {
             UUID colourUuid = dirtyData.createColourUuid();
-            executePrepared("insert into ref_colour(id, name, version) values (?, ?, 1)",
+            executePrepared("insert into ref_colour(id, name, description, version) values (?, ?, ?, 1)",
                     colourUuid,
-                    "Colour " + i);
+                    "Colour " + i,
+                    "Description " + (i < 4 ? "1" : "2"));
         }
 
         UUID driverId = dirtyData.createDriverUuid();
