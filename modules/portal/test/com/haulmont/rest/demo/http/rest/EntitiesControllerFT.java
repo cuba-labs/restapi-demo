@@ -320,6 +320,12 @@ public class EntitiesControllerFT {
             ReadContext ctx = parseResponse(response);
             assertEquals("Colour 5", ctx.read("$.[0].name"));
         }
+    }
+
+    @Test
+    public void loadEntityListWithMultipleOrder() throws Exception {
+        String url = "/entities/ref$Colour";
+        Map<String, String> params = new HashMap<>();
 
         params.put("sort", "description, -name");
         try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
