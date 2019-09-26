@@ -11,6 +11,8 @@ import com.haulmont.cuba.core.global.UuidProvider;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Past;
 import java.util.Date;
 import java.util.UUID;
 
@@ -48,6 +50,16 @@ public class Seller extends BaseLongIdEntity implements Versioned, Creatable, Up
 
     @Column(name = "NAME")
     protected String name;
+
+    @Past(message = "Must be in the past")
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CONTRACT_START_DATE")
+    protected Date contractStartDate;
+
+    @Future(message = "Must be in the future")
+    @Temporal(TemporalType.DATE)
+    @Column(name = "CONTRACT_END_DATE")
+    protected Date contractEndDate;
 
     @Override
     public Integer getVersion() {
@@ -130,6 +142,22 @@ public class Seller extends BaseLongIdEntity implements Versioned, Creatable, Up
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getContractStartDate() {
+        return contractStartDate;
+    }
+
+    public void setContractStartDate(Date contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
+
+    public Date getContractEndDate() {
+        return contractEndDate;
+    }
+
+    public void setContractEndDate(Date contractEndDate) {
+        this.contractEndDate = contractEndDate;
     }
 
     @Override
