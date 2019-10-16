@@ -10,7 +10,7 @@
     </service>
 
     <service name="restdemo_PortalTestService">
-        <method name="sum">
+        <method name="sum" anonymousAllowed="true">
             <param name="number1"/>
             <param name="number2"/>
         </method>
