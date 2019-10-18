@@ -1,11 +1,16 @@
 package com.haulmont.rest.demo;
 
+import com.haulmont.bali.util.Dom4j;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.testsupport.TestContainer;
 import com.haulmont.cuba.testsupport.TestContext;
 import com.haulmont.cuba.testsupport.TestDataSource;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 import javax.naming.NamingException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,11 +37,40 @@ public class RestaddondemoTestContainer extends TestContainer {
                 // or add another one in the end.
                 "com/haulmont/cuba/testsupport/test-app.properties");
 
-        dbDriver = "org.hsqldb.jdbc.JDBCDriver";
-        dbUrl = "jdbc:hsqldb:hsql://localhost/rest_demo";
-        dbUser = "sa";
-        dbPassword = "";
+        initDbProperties();
 
+    }
+
+    private void initDbProperties() {
+        File contextXmlFile = new File("modules/core/web/META-INF/context.xml");
+        if (!contextXmlFile.exists()) {
+            contextXmlFile = new File("web/META-INF/context.xml");
+        }
+        if (!contextXmlFile.exists()) {
+            throw new RuntimeException("Cannot find 'context.xml' file to read database connection properties. " +
+                    "You can set them explicitly in this method.");
+        }
+        Document contextXmlDoc = Dom4j.readDocument(contextXmlFile);
+        Element resourceElem = contextXmlDoc.getRootElement().element("Resource");
+
+        dbDriver = getDbConfigurationValue(resourceElem, "driverClassName");
+        dbUrl = getDbConfigurationValue(resourceElem, "url");
+        dbUser = getDbConfigurationValue(resourceElem, "username");
+        dbPassword = getDbConfigurationValue(resourceElem, "password");
+    }
+
+    @Override
+    protected void initAppProperties() {
+        super.initAppProperties();
+        String dbmsType = System.getProperty("test.db.dbmsType");
+        if (dbmsType != null) {
+            getAppProperties().put("cuba.dbmsType", dbmsType);
+        }
+    }
+
+    protected String getDbConfigurationValue(Element resourceElem, String attributeName) {
+        String externalValue = System.getProperty("test.db." + attributeName);
+        return StringUtils.isNotBlank(externalValue) ? externalValue : resourceElem.attributeValue(attributeName);
     }
 
     @Override
