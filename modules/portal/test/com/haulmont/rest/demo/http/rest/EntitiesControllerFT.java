@@ -323,7 +323,7 @@ public class EntitiesControllerFT {
     }
 
     @Test
-    public void loadEntityListWithMultipleOrder() throws Exception {
+    public void loadEntitiesListWithMultipleOrder() throws Exception {
         String url = "/entities/ref$Colour";
         Map<String, String> params = new HashMap<>();
 
