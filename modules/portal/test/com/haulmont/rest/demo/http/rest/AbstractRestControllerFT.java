@@ -18,7 +18,7 @@ import static com.haulmont.rest.demo.http.rest.RestTestUtils.getAuthToken;
 @Ignore
 public abstract class AbstractRestControllerFT {
 
-    protected static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    protected static final String DB_URL = "jdbc:hsqldb:hsql://localhost:9010/rest_demo";
 
     protected Connection conn;
     protected DataSet dirtyData = new DataSet();

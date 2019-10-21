@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PermissionsControllerFT {
 
-    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost:9010/rest_demo";
     private static EncryptionModule encryption = new BCryptEncryptionModule();
     private Connection conn;
     private DataSet dirtyData = new DataSet();

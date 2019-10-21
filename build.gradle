@@ -10,17 +10,16 @@ buildscript {
                 }
                 url System.getenv('HAULMONT_REPOSITORY_URL')
             }
-        } else {
-            jcenter()
+        }
+        jcenter()
 
-            /*maven { url "https://dl.bintray.com/cuba-platform/main" }*/
+        /*maven { url "https://dl.bintray.com/cuba-platform/main" }*/
 
-            maven {
-                url 'https://repo.cuba-platform.com/content/groups/work'
-                credentials {
-                    username 'cuba'
-                    password 'cuba123'
-                }
+        maven {
+            url 'https://repo.cuba-platform.com/content/groups/work'
+            credentials {
+                username(rootProject.hasProperty('repoUser') ? rootProject['repoUser'] : 'cuba')
+                password(rootProject.hasProperty('repoPass') ? rootProject['repoPass'] : 'cuba123')
             }
         }
     }
@@ -395,7 +394,7 @@ task configureTest(dependsOn: [enableTestProperties, enableRemoteJmx])
 task deployTest(dependsOn: [coreModule.deploy, webModule.deploy, portalModule.deploy])
 
 task prepareTest(dependsOn: [dropTomcat, setupTomcat,
-                             coreModule.createDb, configureTest, 
+                             coreModule.createDb, configureTest,
                              deployTest, start],
         description: 'Prepare server for tests')
 

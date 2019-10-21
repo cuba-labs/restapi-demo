@@ -29,7 +29,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 
 public class ServicesControllerFT {
-    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost:9010/rest_demo";
     @Rule
     public ExpectedException thrown = ExpectedException.none();
     private Connection conn;

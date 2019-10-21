@@ -9,7 +9,7 @@ import groovy.sql.Sql
 
 class DbUtils {
     static Sql getSql() {
-        return Sql.newInstance('jdbc:hsqldb:hsql://localhost/rest_demo',
+        return Sql.newInstance('jdbc:hsqldb:hsql://localhost:9010/rest_demo',
                 'sa', '', 'org.hsqldb.jdbc.JDBCDriver')
     }
 }

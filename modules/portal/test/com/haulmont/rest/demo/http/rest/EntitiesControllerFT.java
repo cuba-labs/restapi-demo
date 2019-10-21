@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class EntitiesControllerFT {
 
-    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost:9010/rest_demo";
     private static final String userLogin = "admin";
     private static final String userPassword = "admin";
     @Rule

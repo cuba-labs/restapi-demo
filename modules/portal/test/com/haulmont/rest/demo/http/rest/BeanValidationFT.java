@@ -35,7 +35,7 @@ public class BeanValidationFT extends AbstractRestControllerFT {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost/rest_demo";
+    private static final String DB_URL = "jdbc:hsqldb:hsql://localhost:9010/rest_demo";
 
     private Connection conn;
     private DataSet dirtyData = new DataSet();

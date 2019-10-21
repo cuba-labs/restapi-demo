@@ -15,7 +15,7 @@
             driverClassName="org.hsqldb.jdbc.JDBCDriver"
             username="sa"
             password=""
-            url="jdbc:hsqldb:hsql://localhost/rest_demo"/>
+            url="jdbc:hsqldb:hsql://localhost:9010/rest_demo"/>
 
     <Resource
             name="jdbc/db1"
