@@ -152,6 +152,38 @@ public class EntitiesControllerSecurityFT {
         }
     }
 
+//    @Test
+//    public void unavailableAttributesMustBeHiddenInCreateResponse() throws Exception {
+//        String url = "/queries/ref_Car/carByVin?vin=VWV000";
+//
+//        try (CloseableHttpResponse response = sendGet(url, carReadUserToken, null)) {
+//            assertEquals(org.apache.http.HttpStatus.SC_OK, statusCode(response));
+//            ReadContext ctx = parseResponse(response);
+//            assertEquals(carUuidString, ctx.read("$.[0].id"));
+//            assertNotNull(ctx.read("$.[0].vin"));
+//            assertNotNull(ctx.read("$.[0].model"));
+//
+//            thrown.expect(PathNotFoundException.class);
+//            ctx.read("$.[0].colour");
+//        }
+//    }
+//
+//    @Test
+//    public void unavailableAttributesMustBeHiddenInUpdateResponse() throws Exception {
+//        String url = "/queries/ref_Car/carByVin?vin=VWV000";
+//
+//        try (CloseableHttpResponse response = sendGet(url, carReadUserToken, null)) {
+//            assertEquals(org.apache.http.HttpStatus.SC_OK, statusCode(response));
+//            ReadContext ctx = parseResponse(response);
+//            assertEquals(carUuidString, ctx.read("$.[0].id"));
+//            assertNotNull(ctx.read("$.[0].vin"));
+//            assertNotNull(ctx.read("$.[0].model"));
+//
+//            thrown.expect(PathNotFoundException.class);
+//            ctx.read("$.[0].colour");
+//        }
+//    }
+
     @Test
     public void unavailableAttributesMustBeHiddenInQueryResult() throws Exception {
         String url = "/queries/ref_Car/carByVin?vin=VWV000";

@@ -12,4 +12,5 @@ public interface SampleJmxService {
     String setAttributeAccessEnabledForRest(boolean enabled);
     String setEntityAttributePermissionChecking(boolean enabled);
     String setRestRequiresSecurityToken(boolean enabled);
+    String setAnonymousAllowed(boolean enabled);
 }
