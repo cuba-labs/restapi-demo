@@ -181,8 +181,8 @@ public class Sample implements SampleAPI, SampleMBean {
 
     @Override
     @Authenticated
-    public String setAnonymousAllowed(boolean enabled) {
-        configStorage.setDbProperty("cuba.rest.anonymousAllowed", enabled ? "true" : "false");
+    public String setAnonymousEnabled(boolean enabled) {
+        configStorage.setDbProperty("cuba.rest.anonymousEnabled", enabled ? "true" : "false");
         configStorage.clearCache();
         return "OK";
     }

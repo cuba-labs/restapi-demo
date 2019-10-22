@@ -45,8 +45,8 @@ public interface SampleMBean {
     @ManagedOperation(description = "Enable/disable cuba.rest.requiresSecurityToken")
     String setRestRequiresSecurityToken(boolean enabled);
 
-    @ManagedOperation(description = "Enable/disable cuba.rest.anonymousAllowed")
-    String setAnonymousAllowed(boolean enabled);
+    @ManagedOperation(description = "Enable/disable cuba.rest.anonymousEnabled")
+    String setAnonymousEnabled(boolean enabled);
 
     @ManagedOperation(description = "Import reports")
     String importReports(byte[] data);

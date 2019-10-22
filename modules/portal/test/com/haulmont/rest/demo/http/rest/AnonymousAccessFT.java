@@ -38,7 +38,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @After
     public void tearDown() {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(false);
+                .setAnonymousEnabled(false);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "false");
     }
@@ -47,7 +47,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeServiceMethodWithAnonymousEnabled() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(true);
+                .setAnonymousEnabled(true);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "true");
 
@@ -61,7 +61,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeServiceMethodWithAnonymousAllowed() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(false);
+                .setAnonymousEnabled(false);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "false");
 
@@ -75,7 +75,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeServiceWithoutAnonymousAllowed() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(false);
+                .setAnonymousEnabled(false);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "false");
 
@@ -87,7 +87,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeQueryWithAnonymousEnabled() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(true);
+                .setAnonymousEnabled(true);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "true");
 
@@ -103,7 +103,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeQueryWithAnonymousAllowed() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(false);
+                .setAnonymousEnabled(false);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "false");
 
@@ -119,7 +119,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void executeQueryWithoutAnonymousAllowed() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(false);
+                .setAnonymousEnabled(false);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "false");
 
@@ -131,7 +131,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void loadEntitiesWithPermissionAnonymous() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(true);
+                .setAnonymousEnabled(true);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "true");
 
@@ -147,7 +147,7 @@ public class AnonymousAccessFT extends AbstractRestControllerFT {
     @Test
     public void loadEntitiesWithoutPermissionAnonymous() throws Exception {
         Connectors.jmx(SampleJmxService.class)
-                .setAnonymousAllowed(true);
+                .setAnonymousEnabled(true);
         Connectors.jmx(WebConfigStorageJmxService.class)
                 .setAppProperty("cuba.rest.anonymousEnabled", "true");
 
