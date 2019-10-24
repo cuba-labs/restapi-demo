@@ -444,6 +444,19 @@ public class EntitiesControllerFT {
     }
 
     @Test
+    public void loadEntitiesFilterIsNull() throws Exception{
+        String url = "/entities/ref_Car/search";
+        String json = getFileContent("entitiesFilterIsNull.json", null);
+        Map<String, String> params = new HashMap<>();
+        params.put("filter", json);
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, params)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals(2, ctx.<Collection>read("$").size());
+        }
+    }
+
+    @Test
     public void loadEntitiesListWithFilterAndCountPost() throws Exception {
         String url = "/entities/ref$Colour/search";
         String json = getFileContent("entitiesFilterPost2.json", null);
