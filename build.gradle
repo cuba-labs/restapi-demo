@@ -396,7 +396,13 @@ task deployTest(dependsOn: [coreModule.deploy, webModule.deploy, portalModule.de
 task prepareTest(dependsOn: [dropTomcat, setupTomcat,
                              coreModule.createDb, configureTest,
                              deployTest, start],
-        description: 'Prepare server for tests')
+        description: 'Prepare server for tests') {
+    doLast {
+        ant.waitfor(maxwait: 30, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            http(url: "http://localhost:8080/app")
+        }
+    }
+}
 
 configureTest.mustRunAfter setupTomcat
 deployTest.mustRunAfter setupTomcat

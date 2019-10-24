@@ -22,7 +22,7 @@ import java.util.Map;
 import static com.haulmont.rest.demo.http.rest.RestTestUtils.*;
 import static org.junit.Assert.assertEquals;
 
-public class AnonymousAccessFT extends AbstractRestControllerFT {
+public class AnonymousAccessFT {
 
     protected Map<String, String> serviceParams;
 
