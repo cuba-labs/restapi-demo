@@ -22,6 +22,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,8 @@ public class BeanValidationFT extends AbstractRestControllerFT {
 
     private Connection conn;
     private DataSet dirtyData = new DataSet();
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat dateFormatRequest = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat dateFormatResponse = new SimpleDateFormat("dd/MM/yyyy");
 
     @Before
     public void setUp() throws Exception {
@@ -219,12 +221,12 @@ public class BeanValidationFT extends AbstractRestControllerFT {
     @Test
     public void createSellerWithInvalidPastDate() throws Exception {
         String url = "/entities/ref$Seller";
-        String futureDateString = getDateWithDifferentDay(5);
+        Date futureDate = getDateWithDifferentDay(5);
 
         Map<String, String> replacement = new HashMap<>();
         replacement.put("$NAME$", "Bob");
-        replacement.put("$CONTRACT_START_DATE$", futureDateString);
-        replacement.put("$CONTRACT_END_DATE$", futureDateString);
+        replacement.put("$CONTRACT_START_DATE$", dateFormatRequest.format(futureDate));
+        replacement.put("$CONTRACT_END_DATE$", dateFormatRequest.format(futureDate));
 
         String json = getFileContent("createNewSeller.json", replacement);
         try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
@@ -235,19 +237,19 @@ public class BeanValidationFT extends AbstractRestControllerFT {
             assertEquals(1, (int) ctx.read("$.length()"));
             assertEquals("Must be in the past", ctx.read("$[0].message"));
             assertEquals("contractStartDate", ctx.read("$[0].path"));
-            assertEquals(futureDateString, ctx.read("$[0].invalidValue"));
+            assertEquals(dateFormatResponse.format(futureDate), ctx.read("$[0].invalidValue"));
         }
     }
 
     @Test
     public void createSellerWithInvalidFutureDate() throws Exception {
         String url = "/entities/ref$Seller";
-        String pastDateString = getDateWithDifferentDay(-5);
+        Date pastDate = getDateWithDifferentDay(-5);
 
         Map<String, String> replacement = new HashMap<>();
         replacement.put("$NAME$", "Dorian Green");
-        replacement.put("$CONTRACT_START_DATE$", pastDateString);
-        replacement.put("$CONTRACT_END_DATE$", pastDateString);
+        replacement.put("$CONTRACT_START_DATE$", dateFormatRequest.format(pastDate));
+        replacement.put("$CONTRACT_END_DATE$", dateFormatRequest.format(pastDate));
 
         String json = getFileContent("createNewSeller.json", replacement);
         try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
@@ -258,14 +260,14 @@ public class BeanValidationFT extends AbstractRestControllerFT {
             assertEquals(1, (int) ctx.read("$.length()"));
             assertEquals("Must be in the future", ctx.read("$[0].message"));
             assertEquals("contractEndDate", ctx.read("$[0].path"));
-            assertEquals(pastDateString, ctx.read("$[0].invalidValue"));
+            assertEquals(dateFormatResponse.format(pastDate), ctx.read("$[0].invalidValue"));
         }
     }
 
-    private String getDateWithDifferentDay(int differentDay) {
+    private Date getDateWithDifferentDay(int differentDay) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, differentDay);
-        return sdf.format(calendar.getTime());
+        return calendar.getTime();
     }
 
     private void executePrepared(String sql, Object... params) throws SQLException {
