@@ -8,6 +8,8 @@ package spec.rest.demo.rest
 import com.haulmont.cuba.core.sys.encryption.BCryptEncryptionModule
 import com.haulmont.cuba.core.sys.encryption.EncryptionModule
 import com.haulmont.cuba.security.entity.ConstraintCheckType
+import com.haulmont.cuba.security.entity.PermissionType
+import com.haulmont.cuba.security.entity.RoleType
 import com.haulmont.rest.demo.http.api.DataSet
 import groovy.sql.Sql
 
@@ -69,12 +71,58 @@ class DataUtils {
         return roleId
     }
 
+    static UUID createRole(DataSet dataSet, Sql sql, String name, RoleType roleType) {
+        def roleId = dataSet.createRoleUuid()
+        sql.dataSet('sec_role').add(
+                id: roleId,
+                version: 1,
+                name: name,
+                role_type: roleType.id
+        )
+        return roleId
+    }
+
+    static UUID createUserRole(DataSet dataSet, Sql sql, UUID userId, UUID roleId) {
+        UUID id = UUID.randomUUID();
+        sql.dataSet('sec_user_role').add(
+                id: id,
+                version: 1,
+                user_id: userId,
+                role_id: roleId
+        )
+        return id
+    }
+
+    static UUID createPermission(DataSet dataSet, Sql sql, UUID roleId, PermissionType permissionType, String target, int value) {
+        def permissionId = dataSet.createPermissionUuid()
+        sql.dataSet('sec_permission').add(
+                id: permissionId,
+                version: 1,
+                role_id: roleId,
+                permission_type: permissionType.id,
+                target: target,
+                value_: value
+        )
+        return permissionId
+    }
+
     static UUID createCar(DataSet dataSet, Sql sql, String vin) {
         def carId = dataSet.createCarUuid()
         sql.dataSet('ref_car').add(
                 id: carId,
                 version: 1,
                 vin: vin
+        )
+        return carId
+    }
+
+    static UUID createCarWithColour(DataSet dataSet, Sql sql, String vin, UUID colourId) {
+        def carId = dataSet.createCarUuid()
+        sql.dataSet('ref_car').add(
+                id: carId,
+                version: 1,
+                vin: vin,
+                colour_id: colourId
         )
         return carId
     }
@@ -115,6 +163,16 @@ class DataUtils {
                 dtype: 'ref$ExtModel'
         )
         return modelId
+    }
+
+    static UUID createColor(DataSet dataSet, Sql sql, String name) {
+        def colorId = dataSet.createColourUuid()
+        sql.dataSet('ref_colour').add(
+                id: colorId,
+                version: 1,
+                name: name
+        )
+        return colorId
     }
 
     static void createPlantModelLink(Sql sql, UUID plantId, UUID modelId) {
