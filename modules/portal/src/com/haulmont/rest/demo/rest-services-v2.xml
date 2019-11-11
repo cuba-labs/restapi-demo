@@ -70,6 +70,10 @@
             <param name="pojoCollection"/>
         </method>
 
+        <method name="methodWithPojoCollectionParameter2">
+            <param name="pojoCollection"/>
+        </method>
+
         <method name="validatedMethod">
             <param name="code"/>
         </method>

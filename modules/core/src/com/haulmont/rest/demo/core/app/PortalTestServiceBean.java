@@ -165,6 +165,12 @@ public class PortalTestServiceBean implements PortalTestService {
     }
 
     @Override
+    public String methodWithPojoCollectionParameter2(List<TestPojo> pojoCollection) {
+        TestPojo testPojo = pojoCollection.get(0);
+        return testPojo.getField1();
+    }
+
+    @Override
     public int validatedMethod(@Pattern(regexp = "\\d+") String code) {
         return 0;
     }

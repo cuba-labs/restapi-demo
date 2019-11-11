@@ -522,6 +522,20 @@ public class ServicesControllerFT {
         }
     }
 
+    /**
+     * Test that a service method parameter (collection of POJOs) is serialized correctly
+     */
+    @Test
+    public void serviceWithPojoCollectionParameter2POST() throws Exception {
+        String paramsJson = getFileContent("serviceWithPojoCollectionParameter.json", null);
+        try (CloseableHttpResponse response = sendPost("/services/" + PortalTestService.NAME + "/methodWithPojoCollectionParameter2",
+                oauthToken, paramsJson, null)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals("Field1 value", ctx.read("$"));
+        }
+    }
+
     @Test
     public void serviceWithPrimitiveListsParam() throws Exception {
         Map<String, String> replacements = new HashMap<>();

@@ -63,6 +63,8 @@ public interface PortalTestService {
 
     int methodWithPojoCollectionParameter(List<TestPojo> pojoCollection);
 
+    String methodWithPojoCollectionParameter2(List<TestPojo> pojoCollection);
+
     @Validated
     int validatedMethod(@Pattern(regexp = "\\d+") String code);
 
