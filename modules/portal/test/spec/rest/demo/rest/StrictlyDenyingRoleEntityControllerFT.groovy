@@ -33,7 +33,7 @@ class StrictlyDenyingRoleEntityControllerFT extends Specification {
         UUID userId = createUser(dirtyData, sql,
                 userLogin, userPassword, groupId)
 
-        UUID roleId = createRole(dirtyData, sql, 'TestStrictDenyingRole', RoleType.STRICT_DENYING)
+        UUID roleId = createRole(dirtyData, sql, 'TestStrictDenyingRole', RoleType.STRICTLY_DENYING)
 
         //access REST API
         createPermission(dirtyData, sql, roleId, PermissionType.SPECIFIC, 'cuba.restApi.enabled', 1)
