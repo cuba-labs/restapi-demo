@@ -96,6 +96,24 @@ public class RestTestUtils {
         return httpClient.execute(httpPut);
     }
 
+    public static CloseableHttpResponse sendPutWithHeaders(String url, String token, String body, @Nullable Map<String, String> params, Map<String, String> headers) throws Exception {
+        URIBuilder uriBuilder = new URIBuilder(URI_BASE + url);
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                uriBuilder.addParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(uriBuilder.build());
+        StringEntity stringEntity = new StringEntity(body);
+        httpPut.setEntity(stringEntity);
+        httpPut.setHeader("Authorization", "Bearer " + token);
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            httpPut.setHeader(entry.getKey(), entry.getValue());
+        }
+        return httpClient.execute(httpPut);
+    }
+
     public static CloseableHttpResponse sendDelete(String url, String token, @Nullable Map<String, String> params) throws Exception {
         URIBuilder uriBuilder = new URIBuilder(URI_BASE + url);
         if (params != null) {
