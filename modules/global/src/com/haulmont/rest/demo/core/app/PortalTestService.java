@@ -33,6 +33,10 @@ public interface PortalTestService {
 
     Integer sum(int number1, String number2);
 
+    void methodWithCustomException();
+
+    void methodWithException();
+
     String overloadedMethod(int param);
 
     String overloadedMethod(String param);

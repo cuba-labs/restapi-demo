@@ -17,6 +17,8 @@ import com.haulmont.cuba.core.global.validation.CustomValidationException;
 import com.haulmont.rest.demo.core.entity.Car;
 import com.haulmont.rest.demo.core.entity.RefappNotPersistentStringIdEntity;
 import com.haulmont.rest.demo.core.entity.TransientDriver;
+import com.haulmont.rest.demo.core.exception.CustomHttpClientErrorException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -49,6 +51,16 @@ public class PortalTestServiceBean implements PortalTestService {
     @Override
     public Integer sum(int number1, String number2) {
         return number1 + Integer.valueOf(number2);
+    }
+
+    @Override
+    public void methodWithCustomException() {
+        throw new CustomHttpClientErrorException(HttpStatus.I_AM_A_TEAPOT, "Server is not a coffee machine");
+    }
+
+    @Override
+    public void methodWithException() {
+        throw new RuntimeException("Error!");
     }
 
     @Override
