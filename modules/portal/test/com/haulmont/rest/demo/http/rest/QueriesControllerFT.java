@@ -302,6 +302,20 @@ public class QueriesControllerFT extends AbstractRestControllerFT {
     }
 
     @Test
+    public void executeQueryWithPredefinedLimitAndOffset() throws Exception {
+        String url = "/queries/ref$Colour/coloursFromThreeToFive";
+
+        try (CloseableHttpResponse response = sendGet(url, oauthToken, null)) {
+            assertEquals(HttpStatus.SC_OK, statusCode(response));
+            ReadContext ctx = parseResponse(response);
+            assertEquals(3, ctx.<Collection>read("$").size());
+            assertEquals("Colour 3", ctx.read("$.[0].name"));
+            assertEquals("Colour 4", ctx.read("$.[1].name"));
+            assertEquals("Colour 5", ctx.read("$.[2].name"));
+        }
+    }
+
+    @Test
     public void executeQueryWithTransform() throws Exception {
         String url = "/queries/ref$OldCar/carByVin";
         Map<String, String> params = new HashMap<>();

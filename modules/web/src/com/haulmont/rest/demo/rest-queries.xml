@@ -30,4 +30,7 @@
             <param name="ids" type="java.util.UUID[]"/>
         </params>
     </query>
+    <query name="coloursFromThreeToFive" entity="ref$Colour" view="_local" limit="3" offset="2">
+        <jpql><![CDATA[select u from ref$Colour u order by u.name]]></jpql>
+    </query>
 </queries>
