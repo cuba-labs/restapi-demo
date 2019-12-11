@@ -85,6 +85,6 @@ class SecurityProfileEntityControllerFT extends Specification {
 
         cleanup:
         Connectors.jmx(WebConfigStorageJmxService.class)
-                .setAppProperty("cuba.rest.securityProfile", null)
+                .setAppProperty("cuba.rest.securityScope", null)
     }
 }
