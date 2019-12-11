@@ -93,6 +93,18 @@ class DataUtils {
         return id
     }
 
+    static UUID createUserRoleWithProfile(DataSet dataSet, Sql sql, UUID userId, UUID roleId, String securityProfile) {
+        UUID id = UUID.randomUUID();
+        sql.dataSet('sec_user_role').add(
+                id: id,
+                version: 1,
+                user_id: userId,
+                role_id: roleId,
+                security_profile: securityProfile
+        )
+        return id
+    }
+
     static UUID createPermission(DataSet dataSet, Sql sql, UUID roleId, PermissionType permissionType, String target, int value) {
         def permissionId = dataSet.createPermissionUuid()
         sql.dataSet('sec_permission').add(
