@@ -10,6 +10,7 @@ import com.haulmont.cuba.core.sys.encryption.EncryptionModule
 import com.haulmont.cuba.security.entity.ConstraintCheckType
 import com.haulmont.cuba.security.entity.PermissionType
 import com.haulmont.cuba.security.entity.RoleType
+import com.haulmont.rest.demo.core.entity.DriverStatus
 import com.haulmont.rest.demo.http.api.DataSet
 import groovy.sql.Sql
 
@@ -114,6 +115,18 @@ class DataUtils {
                 vin: vin
         )
         return carId
+    }
+
+    static UUID createDriver(DataSet dataSet, Sql sql, String name, DriverStatus status) {
+        def driverId = dataSet.createDriverUuid()
+        sql.dataSet('ref_Driver').add(
+                id: driverId,
+                version: 1,
+                dtype: 'ref$ExtDriver',
+                status: status.id,
+                name: name
+        )
+        return driverId
     }
 
     static UUID createCarWithColour(DataSet dataSet, Sql sql, String vin, UUID colourId) {

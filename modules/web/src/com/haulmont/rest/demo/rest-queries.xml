@@ -33,4 +33,10 @@
     <query name="coloursFromThreeToFive" entity="ref$Colour" view="_local" limit="3" offset="2">
         <jpql><![CDATA[select u from ref$Colour u order by u.name]]></jpql>
     </query>
+    <query name="getDriversByStatus" entity="ref$Driver" view="_local">
+        <jpql><![CDATA[select u from ref$Driver u where u.status = :status]]></jpql>
+        <params>
+            <param name="status" type="com.haulmont.rest.demo.core.entity.DriverStatus"/>
+        </params>
+    </query>
 </queries>
