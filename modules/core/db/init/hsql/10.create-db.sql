@@ -28,6 +28,8 @@ create table REF_SELLER (
     DELETED_BY varchar(50),
     --
     NAME varchar(255),
+    CONTRACT_START_DATE timestamp,
+    CONTRACT_END_DATE timestamp,
     --
     primary key (ID)
 )^

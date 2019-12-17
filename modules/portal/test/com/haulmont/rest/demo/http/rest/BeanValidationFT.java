@@ -5,7 +5,6 @@
 
 package com.haulmont.rest.demo.http.rest;
 
-import com.haulmont.cuba.core.sys.persistence.PostgresUUID;
 import com.haulmont.rest.demo.core.app.PortalTestService;
 import com.haulmont.rest.demo.http.api.DataSet;
 import com.jayway.jsonpath.ReadContext;
@@ -22,6 +21,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +41,8 @@ public class BeanValidationFT extends AbstractRestControllerFT {
 
     private Connection conn;
     private DataSet dirtyData = new DataSet();
+    private SimpleDateFormat dateFormatRequest = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat dateFormatResponse = new SimpleDateFormat("dd/MM/yyyy");
 
     @Before
     public void setUp() throws Exception {
@@ -211,6 +215,59 @@ public class BeanValidationFT extends AbstractRestControllerFT {
             assertEquals("{com.haulmont.cuba.core.global.validation.CustomValidationException}", ctx.read("$[0].messageTemplate"));
             assertEquals("Epic fail!", ctx.read("$[0].message"));
         }
+    }
+
+
+    @Test
+    public void createSellerWithInvalidPastDate() throws Exception {
+        String url = "/entities/ref$Seller";
+        Date futureDate = getDateWithDifferentDay(5);
+
+        Map<String, String> replacement = new HashMap<>();
+        replacement.put("$NAME$", "Bob");
+        replacement.put("$CONTRACT_START_DATE$", dateFormatRequest.format(futureDate));
+        replacement.put("$CONTRACT_END_DATE$", dateFormatRequest.format(futureDate));
+
+        String json = getFileContent("createNewSeller.json", replacement);
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+            assertEquals(HttpStatus.SC_BAD_REQUEST, statusCode(response));
+
+            ReadContext ctx = parseResponse(response);
+
+            assertEquals(1, (int) ctx.read("$.length()"));
+            assertEquals("Must be in the past", ctx.read("$[0].message"));
+            assertEquals("contractStartDate", ctx.read("$[0].path"));
+            assertEquals(dateFormatResponse.format(futureDate), ctx.read("$[0].invalidValue"));
+        }
+    }
+
+    @Test
+    public void createSellerWithInvalidFutureDate() throws Exception {
+        String url = "/entities/ref$Seller";
+        Date pastDate = getDateWithDifferentDay(-5);
+
+        Map<String, String> replacement = new HashMap<>();
+        replacement.put("$NAME$", "Dorian Green");
+        replacement.put("$CONTRACT_START_DATE$", dateFormatRequest.format(pastDate));
+        replacement.put("$CONTRACT_END_DATE$", dateFormatRequest.format(pastDate));
+
+        String json = getFileContent("createNewSeller.json", replacement);
+        try (CloseableHttpResponse response = sendPost(url, oauthToken, json, null)) {
+            assertEquals(HttpStatus.SC_BAD_REQUEST, statusCode(response));
+
+            ReadContext ctx = parseResponse(response);
+
+            assertEquals(1, (int) ctx.read("$.length()"));
+            assertEquals("Must be in the future", ctx.read("$[0].message"));
+            assertEquals("contractEndDate", ctx.read("$[0].path"));
+            assertEquals(dateFormatResponse.format(pastDate), ctx.read("$[0].invalidValue"));
+        }
+    }
+
+    private Date getDateWithDifferentDay(int differentDay) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, differentDay);
+        return calendar.getTime();
     }
 
     private void executePrepared(String sql, Object... params) throws SQLException {
