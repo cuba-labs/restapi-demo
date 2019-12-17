@@ -35,5 +35,8 @@
     </query>
     <query name="getDriversByStatus" entity="ref$Driver" view="_local">
         <jpql><![CDATA[select u from ref$Driver u where u.status = :status]]></jpql>
+        <params>
+            <param name="status" type="com.haulmont.rest.demo.core.entity.DriverStatus"/>
+        </params>
     </query>
 </queries>
